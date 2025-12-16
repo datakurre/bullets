@@ -1,7 +1,7 @@
 module View.Present exposing (viewPresentMode)
 
-import Html exposing (Html, button, div, img, text)
-import Html.Attributes exposing (class, src)
+import Html exposing (Html, button, div, img, main_, text)
+import Html.Attributes exposing (attribute, class, src)
 import Html.Events exposing (onClick)
 import MarkdownView exposing (renderMarkdown)
 import Types exposing (Model, Msg(..), Slide)
@@ -19,13 +19,13 @@ viewPresentMode model =
     in
     case currentSlide of
         Just slide ->
-            div [ class "present-mode" ]
+            main_ [ class "present-mode", attribute "role" "main", attribute "aria-label" "Presentation" ]
                 [ viewSlide slide
                 , viewPresentControls model.currentSlideIndex totalSlides
                 ]
 
         Nothing ->
-            div [ class "present-mode" ]
+            main_ [ class "present-mode" ]
                 [ text "No slide to display" ]
 
 
@@ -157,11 +157,11 @@ isCoverSlide content =
 viewPresentControls : Int -> Int -> Html Msg
 viewPresentControls currentIndex totalSlides =
     div [ class "present-controls" ]
-        [ button [ onClick ExitPresentMode, class "btn-exit" ] [ text "✕" ]
+        [ button [ onClick ExitPresentMode, class "btn-exit", attribute "aria-label" "Exit presentation mode" ] [ text "✕" ]
         , div [ class "slide-counter" ]
             [ text (String.fromInt (currentIndex + 1) ++ " / " ++ String.fromInt totalSlides) ]
         , div [ class "nav-buttons" ]
-            [ button [ onClick PrevSlide, class "btn-nav" ] [ text "‹" ]
-            , button [ onClick NextSlide, class "btn-nav" ] [ text "›" ]
+            [ button [ onClick PrevSlide, class "btn-nav", attribute "aria-label" "Previous slide" ] [ text "‹" ]
+            , button [ onClick NextSlide, class "btn-nav", attribute "aria-label" "Next slide" ] [ text "›" ]
             ]
         ]

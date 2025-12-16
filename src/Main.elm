@@ -63,23 +63,55 @@ update msg model =
                 newIndex =
                     Navigation.nextSlide model.currentSlideIndex totalSlides
             in
-            ( { model | currentSlideIndex = newIndex }, Cmd.none )
+            ( { model
+                | currentSlideIndex = newIndex
+                , announcement = "Slide " ++ String.fromInt (newIndex + 1) ++ " of " ++ String.fromInt totalSlides
+              }
+            , Cmd.none
+            )
 
         PrevSlide ->
             let
+                totalSlides =
+                    List.length model.presentation.slides
+
                 newIndex =
                     Navigation.prevSlide model.currentSlideIndex
             in
-            ( { model | currentSlideIndex = newIndex }, Cmd.none )
+            ( { model
+                | currentSlideIndex = newIndex
+                , announcement = "Slide " ++ String.fromInt (newIndex + 1) ++ " of " ++ String.fromInt totalSlides
+              }
+            , Cmd.none
+            )
 
         GoToSlide index ->
-            ( { model | currentSlideIndex = Navigation.goToSlide index }, Cmd.none )
+            let
+                totalSlides =
+                    List.length model.presentation.slides
+            in
+            ( { model
+                | currentSlideIndex = Navigation.goToSlide index
+                , announcement = "Slide " ++ String.fromInt (index + 1) ++ " of " ++ String.fromInt totalSlides
+              }
+            , Cmd.none
+            )
 
         EnterPresentMode ->
-            ( { model | mode = Present }, Cmd.none )
+            ( { model
+                | mode = Present
+                , announcement = "Entering presentation mode"
+              }
+            , Cmd.none
+            )
 
         ExitPresentMode ->
-            ( { model | mode = Edit }, Cmd.none )
+            ( { model
+                | mode = Edit
+                , announcement = "Exiting presentation mode"
+              }
+            , Cmd.none
+            )
 
         AddSlide ->
             let
@@ -103,6 +135,7 @@ update msg model =
                 | presentation = updatedPresentation
                 , currentSlideIndex = newIndex
                 , editingContent = Maybe.map .content newSlide |> Maybe.withDefault "# New Slide"
+                , announcement = "Slide added"
               }
             , savePresentation updatedPresentation
             )
@@ -129,6 +162,7 @@ update msg model =
                 ( { model
                     | presentation = updatedPresentation
                     , currentSlideIndex = newIndex
+                    , announcement = "Slide deleted"
                   }
                 , savePresentation updatedPresentation
                 )
@@ -144,7 +178,12 @@ update msg model =
                 updatedPresentation =
                     { presentation | slides = updatedSlides }
             in
-            ( { model | presentation = updatedPresentation }, savePresentation updatedPresentation )
+            ( { model
+                | presentation = updatedPresentation
+                , announcement = "Slide duplicated"
+              }
+            , savePresentation updatedPresentation
+            )
 
         MoveSlideUp index ->
             if index <= 0 then
@@ -597,7 +636,18 @@ view model =
 
           else
             text ""
+        , viewLiveRegion model.announcement
         ]
+
+
+viewLiveRegion : String -> Html msg
+viewLiveRegion announcement =
+    div
+        [ class "sr-only"
+        , Html.Attributes.attribute "aria-live" "polite"
+        , Html.Attributes.attribute "aria-atomic" "true"
+        ]
+        [ text announcement ]
 
 
 viewHelpDialog : Html Msg
@@ -640,4 +690,3 @@ viewShortcut keys description =
         [ span [ class "help-keys" ] [ text keys ]
         , span [ class "help-description" ] [ text description ]
         ]
-

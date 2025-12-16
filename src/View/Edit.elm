@@ -1,7 +1,7 @@
 module View.Edit exposing (viewEditMode)
 
-import Html exposing (Html, button, div, h3, img, span, text, textarea)
-import Html.Attributes exposing (class, draggable, placeholder, src, value)
+import Html exposing (Html, aside, button, div, h3, img, main_, nav, span, text, textarea)
+import Html.Attributes exposing (attribute, class, draggable, placeholder, src, value)
 import Html.Events exposing (on, onBlur, onClick, onFocus, onInput, preventDefaultOn)
 import Json.Decode as Decode
 import MarkdownView exposing (renderMarkdown)
@@ -18,23 +18,25 @@ viewEditMode model =
 
 viewSidebar : Model -> Html Msg
 viewSidebar model =
-    div [ class "sidebar" ]
+    aside [ class "sidebar", attribute "role" "complementary", attribute "aria-label" "Slide navigation" ]
         [ div [ class "sidebar-header" ]
             [ h3 [] [ text "Slides" ]
-            , button [ onClick AddSlide, class "btn-add" ] [ text "+" ]
+            , button [ onClick AddSlide, class "btn-add", attribute "aria-label" "Add new slide" ] [ text "+" ]
             ]
-        , div [ class "slide-list" ]
-            (List.indexedMap (viewSlideItem model) model.presentation.slides)
+        , nav [ attribute "aria-label" "Slide list" ]
+            [ div [ class "slide-list", attribute "role" "list" ]
+                (List.indexedMap (viewSlideItem model) model.presentation.slides)
+            ]
         , div [ class "sidebar-footer" ]
-            [ button [ onClick EnterPresentMode, class "btn-present" ]
+            [ button [ onClick EnterPresentMode, class "btn-present", attribute "aria-label" "Enter presentation mode" ]
                 [ span [ class "btn-icon-emoji" ] [ text "▶" ]
                 , span [ class "btn-label" ] [ text "Present" ]
                 ]
-            , button [ onClick ImportPPTXRequested, class "btn-import-pptx" ]
+            , button [ onClick ImportPPTXRequested, class "btn-import-pptx", attribute "aria-label" "Import PowerPoint PPTX file" ]
                 [ span [ class "btn-icon-emoji" ] [ text "📥" ]
                 , span [ class "btn-label" ] [ text "Import PPTX" ]
                 ]
-            , button [ onClick ExportToPPTX, class "btn-export" ]
+            , button [ onClick ExportToPPTX, class "btn-export", attribute "aria-label" "Export to PowerPoint PPTX" ]
                 [ span [ class "btn-icon-emoji" ] [ text "📊" ]
                 , span [ class "btn-label" ] [ text "Export PPTX" ]
                 ]
@@ -89,6 +91,12 @@ viewSlideItem model index slide =
             , on "dragend" (Decode.succeed DragEnd)
             , preventDefaultOn "dragover" (Decode.succeed ( DragOver index, True ))
             , on "drop" (Decode.succeed (Drop index))
+            , attribute "role" "listitem"
+            , if isActive then
+                attribute "aria-current" "true"
+
+              else
+                attribute "aria-current" "false"
             ]
             [ div [ class "slide-item-content" ]
                 [ span [ class "slide-number" ] [ text (String.fromInt (index + 1)) ]
@@ -100,11 +108,11 @@ viewSlideItem model index slide =
                     Nothing ->
                         text ""
                 ]
-            , div [ class "slide-item-actions" ]
-                [ button [ onClick (MoveSlideUp index), class "btn-icon" ] [ text "↑" ]
-                , button [ onClick (MoveSlideDown index), class "btn-icon" ] [ text "↓" ]
-                , button [ onClick (DuplicateSlide index), class "btn-icon" ] [ text "⎘" ]
-                , button [ onClick (DeleteSlide index), class "btn-icon btn-danger" ] [ text "×" ]
+            , div [ class "slide-item-actions", attribute "role" "toolbar", attribute "aria-label" "Slide actions" ]
+                [ button [ onClick (MoveSlideUp index), class "btn-icon", attribute "aria-label" "Move slide up" ] [ text "↑" ]
+                , button [ onClick (MoveSlideDown index), class "btn-icon", attribute "aria-label" "Move slide down" ] [ text "↓" ]
+                , button [ onClick (DuplicateSlide index), class "btn-icon", attribute "aria-label" "Duplicate slide" ] [ text "⎘" ]
+                , button [ onClick (DeleteSlide index), class "btn-icon btn-danger", attribute "aria-label" "Delete slide" ] [ text "×" ]
                 ]
             ]
         ]
@@ -119,33 +127,33 @@ viewEditor model =
     in
     case currentSlide of
         Just slide ->
-            div [ class "editor" ]
+            main_ [ class "editor", attribute "role" "main", attribute "aria-label" "Slide editor" ]
                 [ viewEditorToolbar slide
                 , viewEditorMain slide
                 , viewEditorPreview slide
                 ]
 
         Nothing ->
-            div [ class "editor" ]
+            main_ [ class "editor" ]
                 [ text "No slide selected" ]
 
 
 viewEditorToolbar : Slide -> Html Msg
 viewEditorToolbar slide =
-    div [ class "editor-toolbar" ]
+    div [ class "editor-toolbar", attribute "role" "region", attribute "aria-label" "Image controls" ]
         [ div [ class "image-controls" ]
             [ if slide.image /= Nothing then
-                button [ onClick RemoveImage, class "btn-remove-image" ] [ text "Remove Image" ]
+                button [ onClick RemoveImage, class "btn-remove-image", attribute "aria-label" "Remove current image from slide" ] [ text "Remove Image" ]
 
               else
-                button [ onClick ImageUploadRequested, class "btn-upload-image" ] [ text "📁 Upload Image" ]
+                button [ onClick ImageUploadRequested, class "btn-upload-image", attribute "aria-label" "Upload image file" ] [ text "📁 Upload Image" ]
             ]
         ]
 
 
 viewEditorMain : Slide -> Html Msg
 viewEditorMain slide =
-    div [ class "editor-main" ]
+    div [ class "editor-main", attribute "role" "region", attribute "aria-label" "Content editor" ]
         [ textarea
             [ class "editor-textarea"
             , value slide.content
@@ -153,6 +161,7 @@ viewEditorMain slide =
             , onFocus TextareaFocused
             , onBlur TextareaBlurred
             , placeholder "Enter markdown content..."
+            , attribute "aria-label" "Slide content editor"
             ]
             []
         ]
@@ -173,7 +182,7 @@ viewEditorPreview slide =
         hasImage =
             slide.image /= Nothing
     in
-    div [ class "editor-preview" ]
+    div [ class "editor-preview", attribute "role" "region", attribute "aria-label" "Slide preview" ]
         [ div
             [ class
                 ("preview-slide preview-"

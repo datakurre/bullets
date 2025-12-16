@@ -42,6 +42,7 @@ type alias Model =
     , dropTargetIndex : Maybe Int
     , isTextareaFocused : Bool
     , showHelpDialog : Bool
+    , announcement : String
     }
 
 
@@ -106,4 +107,5 @@ initialModel =
     , dropTargetIndex = Nothing
     , isTextareaFocused = False
     , showHelpDialog = False
+    , announcement = ""
     }
