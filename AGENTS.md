@@ -10,40 +10,49 @@
 
 ✅ **COMPLETED** - All core features and vision items have been implemented:
 - Edit mode with slide management (add, delete, duplicate, reorder)
-- Three slide layouts (TitleOnly, JustMarkdown, MarkdownWithImage)
+- Drag and drop slide arrangement
+- Arrow key navigation in edit mode
+- Three slide layouts (JustMarkdown, MarkdownWithImage)
 - Presentation mode with keyboard navigation
 - Image paste support via clipboard AND file upload
 - JSON import/export
 - Local storage autosave/autoload
-- Complete CSS styling with clean black-on-off-white color scheme
+- Complete CSS styling with clean left-aligned design
 - Markdown rendering in both preview and presentation modes
-- VIM-style keybindings (j/k navigation, g/G, p for present)
+- VIM-style keybindings (j/k/arrow navigation, g/G, p for present)
 - GitHub Pages deployment workflow
+- Comprehensive unit test suite (72 tests)
+- elm-review integration for code quality
 
-Latest commits:
-- 31f43cf: Add VIM-style keybindings for navigation
-- 51ac2e0: Add GitHub Pages deployment workflow and README
-- 8b71985: Add image upload from filesystem
-- 19224dd: Add markdown rendering to preview and presentation mode
-- 80b9362: Add autosave and autoload using browser local storage
+Recent commits:
+- c22fa1b: Add arrow key navigation in edit mode for slide selection
+- 8c98260: Cleanup presentation view: remove dark background and align slides consistently
+- 56a7f54: Fix elm-review issues and add manual testing documentation
+- 0855b1e: Add drag and drop slide arrangement functionality
+- ec3c201: Remove all text centering from markdown content and titles
+
+🚧 **IN PROGRESS**:
+- PowerPoint PPTX export (detailed plan in TODO-PPTX.md)
 
 ## Current Features
 
 ### Edit Mode
 - Sidebar with slide list and thumbnails
-- Add, delete, duplicate, and reorder slides
-- Three layout options: Title Only, Markdown, Markdown + Image
+- Add, delete, duplicate, and reorder slides (via buttons or drag & drop)
+- Two layout options: Markdown, Markdown + Image
 - Live markdown preview
 - Image support: paste from clipboard or upload from filesystem
 - Auto-save to browser local storage
 - Export to JSON file
 - Import from JSON file
 - VIM-style navigation: j/k for next/prev slide, g/G for first/last, p for present
+- Arrow key navigation: Up/Down arrows for next/prev slide
 
 ### Presentation Mode
-- Full-screen clean display
+- Clean light-themed display (beige background)
 - Rendered markdown (not source)
 - Layout-specific rendering
+- All content left-aligned (no centering)
 - Image display for split layouts
 - Multiple navigation options: arrows, space, enter, j/k/h/l
 - VIM-style shortcuts: g for first slide, G for last slide
@@ -53,10 +62,10 @@ Latest commits:
 
 A minimal, elegant presentation tool that:
 - Uses markdown for content authoring
-- Supports multiple slide layouts (title only, markdown, markdown with image)
+- Supports multiple slide layouts (markdown, markdown with image)
 - Handles images via copy-paste (stored as data URIs)
 - Allows import/export of presentations as JSON
-- Features a clean black-on-off-white color scheme
+- Features a clean left-aligned design with consistent styling
 
 ## Development Environment
 
@@ -89,8 +98,7 @@ The project uses a Makefile with these targets:
 - layout: SlideLayout
 - image: Maybe String (data URI)
 
-**SlideLayout**: Three variants
-- TitleOnly: Large centered title
+**SlideLayout**: Two variants
 - JustMarkdown: Full-width markdown content
 - MarkdownWithImage: Split view (markdown left, image right)
 
@@ -103,12 +111,14 @@ The project uses a Makefile with these targets:
 - currentSlideIndex: Int
 - presentation: Presentation
 - editingContent: String (buffer for current edits)
+- draggedSlideIndex: Maybe Int (for drag and drop)
 
 ### Message Types
 
 - Navigation: NextSlide, PrevSlide, GoToSlide Int
 - Mode switching: EnterPresentMode, ExitPresentMode
 - Slide management: AddSlide, DeleteSlide Int, DuplicateSlide Int, MoveSlideUp Int, MoveSlideDown Int
+- Drag and drop: DragStart Int, DragOver, DragEnd, Drop Int
 - Content editing: UpdateContent String, ChangeLayout SlideLayout
 - Image handling: ImagePasted String, ImageUploadRequested, ImageFileSelected File, ImageFileLoaded String, RemoveImage
 - File operations: DownloadJSON, LoadJSONRequested, FileSelected File, FileLoaded String
@@ -147,9 +157,11 @@ The project uses a Makefile with these targets:
 ## Testing Strategy
 
 - Unit tests for pure functions (encoders, decoders, transformations)
-- Manual testing for UI interactions
+- Manual testing for UI interactions (documented in MANUAL_TESTING.md)
 - Cross-browser testing before major releases
 - Focus on data integrity (JSON round-trip correctness)
+- Run elm-review for code quality checks
+- All tests pass: 72 unit tests currently in test suite
 
 ## Dependencies
 
