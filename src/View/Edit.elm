@@ -2,7 +2,7 @@ module View.Edit exposing (viewEditMode)
 
 import Html exposing (Html, button, div, h3, img, option, select, span, text, textarea)
 import Html.Attributes exposing (class, draggable, placeholder, selected, src, value)
-import Html.Events exposing (on, onClick, onInput, preventDefaultOn)
+import Html.Events exposing (on, onBlur, onClick, onFocus, onInput, preventDefaultOn)
 import Json.Decode as Decode
 import MarkdownView exposing (renderMarkdown)
 import Types exposing (Model, Msg(..), Slide, SlideLayout(..))
@@ -141,6 +141,8 @@ viewEditorMain slide =
             [ class "editor-textarea"
             , value slide.content
             , onInput UpdateContent
+            , onFocus TextareaFocused
+            , onBlur TextareaBlurred
             , placeholder "Enter markdown content..."
             ]
             []

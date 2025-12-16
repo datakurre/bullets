@@ -415,56 +415,61 @@ update msg model =
 
                 Edit ->
                     -- VIM keybindings for edit mode (when not in textarea)
-                    case key of
-                        "j" ->
-                            let
-                                maxIndex =
-                                    List.length model.presentation.slides - 1
+                    -- Ignore keyboard shortcuts if textarea is focused
+                    if model.isTextareaFocused then
+                        ( model, Cmd.none )
 
-                                newIndex =
-                                    min maxIndex (model.currentSlideIndex + 1)
-                            in
-                            update (GoToSlide newIndex) model
+                    else
+                        case key of
+                            "j" ->
+                                let
+                                    maxIndex =
+                                        List.length model.presentation.slides - 1
 
-                        "k" ->
-                            let
-                                newIndex =
-                                    max 0 (model.currentSlideIndex - 1)
-                            in
-                            update (GoToSlide newIndex) model
+                                    newIndex =
+                                        min maxIndex (model.currentSlideIndex + 1)
+                                in
+                                update (GoToSlide newIndex) model
 
-                        "ArrowDown" ->
-                            let
-                                maxIndex =
-                                    List.length model.presentation.slides - 1
+                            "k" ->
+                                let
+                                    newIndex =
+                                        max 0 (model.currentSlideIndex - 1)
+                                in
+                                update (GoToSlide newIndex) model
 
-                                newIndex =
-                                    min maxIndex (model.currentSlideIndex + 1)
-                            in
-                            update (GoToSlide newIndex) model
+                            "ArrowDown" ->
+                                let
+                                    maxIndex =
+                                        List.length model.presentation.slides - 1
 
-                        "ArrowUp" ->
-                            let
-                                newIndex =
-                                    max 0 (model.currentSlideIndex - 1)
-                            in
-                            update (GoToSlide newIndex) model
+                                    newIndex =
+                                        min maxIndex (model.currentSlideIndex + 1)
+                                in
+                                update (GoToSlide newIndex) model
 
-                        "p" ->
-                            update EnterPresentMode model
+                            "ArrowUp" ->
+                                let
+                                    newIndex =
+                                        max 0 (model.currentSlideIndex - 1)
+                                in
+                                update (GoToSlide newIndex) model
 
-                        "g" ->
-                            update (GoToSlide 0) model
+                            "p" ->
+                                update EnterPresentMode model
 
-                        "G" ->
-                            let
-                                lastIndex =
-                                    List.length model.presentation.slides - 1
-                            in
-                            update (GoToSlide lastIndex) model
+                            "g" ->
+                                update (GoToSlide 0) model
 
-                        _ ->
-                            ( model, Cmd.none )
+                            "G" ->
+                                let
+                                    lastIndex =
+                                        List.length model.presentation.slides - 1
+                                in
+                                update (GoToSlide lastIndex) model
+
+                            _ ->
+                                ( model, Cmd.none )
 
         DragStart index ->
             ( { model | draggedSlideIndex = Just index }, Cmd.none )
@@ -540,6 +545,12 @@ update msg model =
 
                     Err _ ->
                         ( model, Cmd.none )
+
+        TextareaFocused ->
+            ( { model | isTextareaFocused = True }, Cmd.none )
+
+        TextareaBlurred ->
+            ( { model | isTextareaFocused = False }, Cmd.none )
 
 
 savePresentation : Presentation -> Cmd Msg

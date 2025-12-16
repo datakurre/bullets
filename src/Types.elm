@@ -46,6 +46,7 @@ type alias Model =
     , presentation : Presentation
     , editingContent : String
     , draggedSlideIndex : Maybe Int
+    , isTextareaFocused : Bool
     }
 
 
@@ -77,6 +78,8 @@ type Msg
     | DragOver
     | DragEnd
     | Drop Int
+    | TextareaFocused
+    | TextareaBlurred
 
 
 
@@ -107,4 +110,5 @@ initialModel =
     , presentation = initialPresentation
     , editingContent = initialSlide.content
     , draggedSlideIndex = Nothing
+    , isTextareaFocused = False
     }
