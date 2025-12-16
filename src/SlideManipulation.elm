@@ -8,7 +8,7 @@ module SlideManipulation exposing
     , swapSlides
     )
 
-import Types exposing (Slide, SlideLayout(..))
+import Types exposing (Slide)
 
 
 {-| Add a new slide to the end of the slides list
@@ -18,7 +18,6 @@ addSlide slides =
     let
         newSlide =
             { content = "# New Slide"
-            , layout = JustMarkdown
             , image = Nothing
             }
     in

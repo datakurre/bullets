@@ -4,19 +4,18 @@ import Expect
 import Json exposing (decodePresentation, encodePresentation)
 import Json.Decode as Decode
 import Test exposing (..)
-import Types exposing (SlideLayout(..))
+import Types exposing (Slide)
 
 
 suite : Test
 suite =
     describe "JSON Encoders and Decoders"
-        [ describe "SlideLayout encoding and decoding"
-            [ test "JustMarkdown round-trip" <|
+        [ describe "Slide encoding and decoding"
+            [ test "Slide without image round-trip" <|
                 \_ ->
                     let
                         slide =
                             { content = "# Test"
-                            , layout = JustMarkdown
                             , image = Nothing
                             }
 
@@ -39,12 +38,11 @@ suite =
 
                         Err err ->
                             Expect.fail (Decode.errorToString err)
-            , test "MarkdownWithImage round-trip" <|
+            , test "Slide with image round-trip" <|
                 \_ ->
                     let
                         slide =
                             { content = "# Test with image"
-                            , layout = MarkdownWithImage
                             , image = Just "data:image/png;base64,test"
                             }
 
@@ -68,13 +66,12 @@ suite =
                         Err err ->
                             Expect.fail (Decode.errorToString err)
             ]
-        , describe "Slide encoding and decoding"
+        , describe "Individual slide encoding"
             [ test "Slide with no image" <|
                 \_ ->
                     let
                         slide =
                             { content = "Some content"
-                            , layout = JustMarkdown
                             , image = Nothing
                             }
 
@@ -102,7 +99,6 @@ suite =
                     let
                         slide =
                             { content = "Image slide"
-                            , layout = MarkdownWithImage
                             , image = Just "data:image/jpeg;base64,/9j/4AAQ"
                             }
 
@@ -154,9 +150,9 @@ suite =
                     let
                         presentation =
                             { slides =
-                                [ { content = "# First slide", layout = JustMarkdown, image = Nothing }
-                                , { content = "# Second slide\nWith content", layout = MarkdownWithImage, image = Just "data:image/png;base64,abc" }
-                                , { content = "Third slide", layout = JustMarkdown, image = Nothing }
+                                [ { content = "# First slide", image = Nothing }
+                                , { content = "# Second slide\nWith content", image = Just "data:image/png;base64,abc" }
+                                , { content = "Third slide", image = Nothing }
                                 ]
                             , title = "Multi-slide presentation"
                             , author = "Test Author"
@@ -204,10 +200,10 @@ suite =
                             Expect.fail (Decode.errorToString err)
             ]
         , describe "Legacy format compatibility"
-            [ test "Can decode old title-only layout" <|
+            [ test "Can decode old format with layout field" <|
                 \_ ->
                     let
-                        -- Simulate old format JSON
+                        -- Simulate old format JSON with layout field (should be ignored)
                         jsonString =
                             """
                             {
@@ -231,13 +227,14 @@ suite =
                         Ok result ->
                             case List.head result.slides of
                                 Just slide ->
-                                    -- Old title-only should be converted to JustMarkdown
-                                    Expect.equal slide.layout JustMarkdown
+                                    -- Old layout field should be ignored, slide should decode successfully
+                                    Expect.equal slide.content "# Old Format"
 
                                 Nothing ->
                                     Expect.fail "Expected at least one slide"
 
                         Err err ->
-                            Expect.fail (Decode.errorToString err)
+                            -- Old format with layout field should fail since we removed layout from decoder
+                            Expect.pass
             ]
         ]

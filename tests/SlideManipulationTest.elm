@@ -2,7 +2,7 @@ module SlideManipulationTest exposing (..)
 
 import Expect
 import Test exposing (..)
-import Types exposing (Slide, SlideLayout(..))
+import Types exposing (Slide)
 import SlideManipulation exposing (..)
 
 
@@ -11,7 +11,6 @@ import SlideManipulation exposing (..)
 makeSlide : String -> Slide
 makeSlide content =
     { content = content
-    , layout = JustMarkdown
     , image = Nothing
     }
 
@@ -41,16 +40,6 @@ suite =
                     case List.head result of
                         Just slide ->
                             Expect.equal slide.content "# New Slide"
-                        Nothing ->
-                            Expect.fail "Expected a slide"
-            , test "new slide has JustMarkdown layout" <|
-                \_ ->
-                    let
-                        result = addSlide []
-                    in
-                    case List.head result of
-                        Just slide ->
-                            Expect.equal slide.layout JustMarkdown
                         Nothing ->
                             Expect.fail "Expected a slide"
             , test "new slide has no image" <|
@@ -149,7 +138,6 @@ suite =
                     let
                         originalSlide = 
                             { content = "Special Content"
-                            , layout = MarkdownWithImage
                             , image = Just "data:image/png;base64,test"
                             }
                         slides = [ makeSlide "First", originalSlide, makeSlide "Third" ]
@@ -276,12 +264,10 @@ suite =
                     let
                         slide1 = 
                             { content = "Content 1"
-                            , layout = JustMarkdown
                             , image = Nothing
                             }
                         slide2 = 
                             { content = "Content 2"
-                            , layout = MarkdownWithImage
                             , image = Just "data:image/png;base64,test"
                             }
                         slides = [ slide1, slide2 ]
@@ -366,7 +352,6 @@ suite =
                         slide1 = makeSlide "Content 1"
                         slide2 = 
                             { content = "Content 2"
-                            , layout = MarkdownWithImage
                             , image = Just "data:image/png;base64,test"
                             }
                         slide3 = makeSlide "Content 3"

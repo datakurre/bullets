@@ -4,7 +4,6 @@ module Types exposing
     , Msg(..)
     , Presentation
     , Slide
-    , SlideLayout(..)
     , initialModel
     )
 
@@ -20,14 +19,8 @@ type Mode
     | Present
 
 
-type SlideLayout
-    = JustMarkdown
-    | MarkdownWithImage
-
-
 type alias Slide =
     { content : String
-    , layout : SlideLayout
     , image : Maybe String
     }
 
@@ -62,7 +55,6 @@ type Msg
     | MoveSlideUp Int
     | MoveSlideDown Int
     | UpdateContent String
-    | ChangeLayout SlideLayout
     | ImagePasted String
     | RemoveImage
     | ImageUploadRequested
@@ -88,7 +80,6 @@ type Msg
 initialSlide : Slide
 initialSlide =
     { content = "# Welcome to Bullets\n\nA minimal presentation tool"
-    , layout = JustMarkdown
     , image = Nothing
     }
 

@@ -4,7 +4,7 @@ import Html exposing (Html, button, div, img, text)
 import Html.Attributes exposing (class, src)
 import Html.Events exposing (onClick)
 import MarkdownView exposing (renderMarkdown)
-import Types exposing (Model, Msg(..), Slide, SlideLayout(..))
+import Types exposing (Model, Msg(..), Slide)
 
 
 viewPresentMode : Model -> Html Msg
@@ -40,42 +40,44 @@ viewSlide slide =
         
         hasContent =
             not (String.isEmpty (String.trim slide.content))
+        
+        hasImage =
+            slide.image /= Nothing
     in
-    div [ class ("slide slide-" ++ layoutClass slide.layout ++ if isOnlyTitle then " slide-title-centered" else if isCoverStyle then " slide-cover" else "") ]
-        [ case slide.layout of
-            JustMarkdown ->
-                div [ class (if isOnlyTitle then "slide-title" else "slide-markdown") ]
-                    [ div [ class (if isOnlyTitle then "title-content" else "markdown-content") ]
-                        [ renderMarkdown slide.content ]
-                    ]
+    div [ class ("slide slide-" ++ (if hasImage then "markdown-with-image" else "just-markdown") ++ if isOnlyTitle then " slide-title-centered" else if isCoverStyle then " slide-cover" else "") ]
+        [ if hasImage then
+            if not hasContent && slide.image /= Nothing then
+                -- Image only, take full slide
+                div [ class "slide-image-full" ]
+                    [ case slide.image of
+                        Just dataUri ->
+                            img [ src dataUri, class "slide-image-fullscreen" ] []
 
-            MarkdownWithImage ->
-                if not hasContent && slide.image /= Nothing then
-                    -- Image only, take full slide
-                    div [ class "slide-image-full" ]
+                        Nothing ->
+                            text ""
+                    ]
+            else
+                -- Normal split layout
+                div [ class "slide-split" ]
+                    [ div [ class "slide-markdown-left" ]
+                        [ div [ class "markdown-content" ]
+                            [ renderMarkdown slide.content ]
+                        ]
+                    , div [ class "slide-image-right" ]
                         [ case slide.image of
                             Just dataUri ->
-                                img [ src dataUri, class "slide-image-fullscreen" ] []
+                                img [ src dataUri, class "slide-image" ] []
 
                             Nothing ->
                                 text ""
                         ]
-                else
-                    -- Normal split layout
-                    div [ class "slide-split" ]
-                        [ div [ class "slide-markdown-left" ]
-                            [ div [ class "markdown-content" ]
-                                [ renderMarkdown slide.content ]
-                            ]
-                        , div [ class "slide-image-right" ]
-                            [ case slide.image of
-                                Just dataUri ->
-                                    img [ src dataUri, class "slide-image" ] []
-
-                                Nothing ->
-                                    text ""
-                            ]
-                        ]
+                    ]
+          else
+            -- No image, just markdown
+            div [ class (if isOnlyTitle then "slide-title" else "slide-markdown") ]
+                [ div [ class (if isOnlyTitle then "title-content" else "markdown-content") ]
+                    [ renderMarkdown slide.content ]
+                ]
         ]
 
 
@@ -126,13 +128,3 @@ viewPresentControls currentIndex totalSlides =
             , button [ onClick NextSlide, class "btn-nav" ] [ text "›" ]
             ]
         ]
-
-
-layoutClass : SlideLayout -> String
-layoutClass layout =
-    case layout of
-        JustMarkdown ->
-            "markdown"
-
-        MarkdownWithImage ->
-            "split"

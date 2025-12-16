@@ -2,7 +2,7 @@ module Json exposing (decodePresentation, encodePresentation)
 
 import Json.Decode as Decode exposing (Decoder)
 import Json.Encode as Encode
-import Types exposing (Presentation, Slide, SlideLayout(..))
+import Types exposing (Presentation, Slide)
 
 
 
@@ -23,7 +23,6 @@ encodeSlide : Slide -> Encode.Value
 encodeSlide slide =
     Encode.object
         [ ( "content", Encode.string slide.content )
-        , ( "layout", encodeSlideLayout slide.layout )
         , ( "image"
           , case slide.image of
                 Just img ->
@@ -33,16 +32,6 @@ encodeSlide slide =
                     Encode.null
           )
         ]
-
-
-encodeSlideLayout : SlideLayout -> Encode.Value
-encodeSlideLayout layout =
-    case layout of
-        JustMarkdown ->
-            Encode.string "just-markdown"
-
-        MarkdownWithImage ->
-            Encode.string "markdown-with-image"
 
 
 
@@ -60,28 +49,6 @@ decodePresentation =
 
 decodeSlide : Decoder Slide
 decodeSlide =
-    Decode.map3 Slide
+    Decode.map2 Slide
         (Decode.field "content" Decode.string)
-        (Decode.field "layout" decodeSlideLayout)
         (Decode.field "image" (Decode.nullable Decode.string))
-
-
-decodeSlideLayout : Decoder SlideLayout
-decodeSlideLayout =
-    Decode.string
-        |> Decode.andThen
-            (\str ->
-                case str of
-                    "title-only" ->
-                        -- Legacy format, convert to JustMarkdown
-                        Decode.succeed JustMarkdown
-
-                    "just-markdown" ->
-                        Decode.succeed JustMarkdown
-
-                    "markdown-with-image" ->
-                        Decode.succeed MarkdownWithImage
-
-                    _ ->
-                        Decode.fail ("Unknown layout: " ++ str)
-            )

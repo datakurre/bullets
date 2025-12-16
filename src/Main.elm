@@ -239,27 +239,6 @@ update msg model =
             , savePresentation updatedPresentation
             )
 
-        ChangeLayout layout ->
-            let
-                presentation =
-                    model.presentation
-
-                updatedSlides =
-                    List.indexedMap
-                        (\i slide ->
-                            if i == model.currentSlideIndex then
-                                { slide | layout = layout }
-
-                            else
-                                slide
-                        )
-                        presentation.slides
-
-                updatedPresentation =
-                    { presentation | slides = updatedSlides }
-            in
-            ( { model | presentation = updatedPresentation }, savePresentation updatedPresentation )
-
         ImagePasted dataUri ->
             let
                 presentation =

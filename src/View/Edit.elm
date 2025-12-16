@@ -1,11 +1,11 @@
 module View.Edit exposing (viewEditMode)
 
-import Html exposing (Html, button, div, h3, img, option, select, span, text, textarea)
-import Html.Attributes exposing (class, draggable, placeholder, selected, src, value)
+import Html exposing (Html, button, div, h3, img, span, text, textarea)
+import Html.Attributes exposing (class, draggable, placeholder, src, value)
 import Html.Events exposing (on, onBlur, onClick, onFocus, onInput, preventDefaultOn)
 import Json.Decode as Decode
 import MarkdownView exposing (renderMarkdown)
-import Types exposing (Model, Msg(..), Slide, SlideLayout(..))
+import Types exposing (Model, Msg(..), Slide)
 
 
 viewEditMode : Model -> Html Msg
@@ -100,38 +100,14 @@ viewEditor model =
 viewEditorToolbar : Slide -> Html Msg
 viewEditorToolbar slide =
     div [ class "editor-toolbar" ]
-        [ div [ class "layout-selector" ]
-            [ text "Layout: "
-            , select [ onInput layoutFromString ]
-                [ option [ value "just-markdown", selected (slide.layout == JustMarkdown) ] [ text "Markdown" ]
-                , option [ value "markdown-with-image", selected (slide.layout == MarkdownWithImage) ] [ text "Markdown + Image" ]
-                ]
+        [ div [ class "image-controls" ]
+            [ if slide.image /= Nothing then
+                button [ onClick RemoveImage, class "btn-remove-image" ] [ text "Remove Image" ]
+
+              else
+                button [ onClick ImageUploadRequested, class "btn-upload-image" ] [ text "📁 Upload Image" ]
             ]
-        , if slide.layout == MarkdownWithImage then
-            div [ class "image-controls" ]
-                [ if slide.image /= Nothing then
-                    button [ onClick RemoveImage, class "btn-remove-image" ] [ text "Remove Image" ]
-
-                  else
-                    button [ onClick ImageUploadRequested, class "btn-upload-image" ] [ text "📁 Upload Image" ]
-                ]
-
-          else
-            text ""
         ]
-
-
-layoutFromString : String -> Msg
-layoutFromString str =
-    case str of
-        "just-markdown" ->
-            ChangeLayout JustMarkdown
-
-        "markdown-with-image" ->
-            ChangeLayout MarkdownWithImage
-
-        _ ->
-            ChangeLayout JustMarkdown
 
 
 viewEditorMain : Slide -> Html Msg
@@ -160,18 +136,14 @@ viewEditorPreview slide =
         
         hasContent =
             not (String.isEmpty (String.trim slide.content))
+        
+        hasImage =
+            slide.image /= Nothing
     in
     div [ class "editor-preview" ]
-        [ div [ class ("preview-slide preview-" ++ layoutClass slide.layout ++ if isOnlyTitle then " preview-title-centered" else if isCoverStyle then " preview-cover" else "") ]
-            [ case slide.layout of
-                JustMarkdown ->
-                    div [ class (if isOnlyTitle then "preview-title" else "preview-markdown") ]
-                        [ div [ class (if isOnlyTitle then "title-content" else "markdown-content") ]
-                            [ renderMarkdown slide.content ]
-                        ]
-
-                MarkdownWithImage ->
-                    if not hasContent && slide.image /= Nothing then
+        [ div [ class ("preview-slide preview-" ++ (if hasImage then "markdown-with-image" else "just-markdown") ++ if isOnlyTitle then " preview-title-centered" else if isCoverStyle then " preview-cover" else "") ]
+            [ if hasImage then
+                if not hasContent && slide.image /= Nothing then
                         -- Image only, take full slide
                         div [ class "preview-image-full" ]
                             [ case slide.image of
@@ -197,6 +169,12 @@ viewEditorPreview slide =
                                         div [ class "image-placeholder" ] [ text "Paste an image here" ]
                                 ]
                             ]
+              else
+                -- No image, just markdown
+                div [ class (if isOnlyTitle then "preview-title" else "preview-markdown") ]
+                    [ div [ class (if isOnlyTitle then "title-content" else "markdown-content") ]
+                        [ renderMarkdown slide.content ]
+                    ]
             ]
         ]
 
@@ -235,13 +213,3 @@ isCoverSlide content =
         
         _ ->
             False
-
-
-layoutClass : SlideLayout -> String
-layoutClass layout =
-    case layout of
-        JustMarkdown ->
-            "markdown"
-
-        MarkdownWithImage ->
-            "split"
