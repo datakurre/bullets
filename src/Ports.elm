@@ -1,4 +1,4 @@
-port module Ports exposing (exportToPPTX, imagePasted, loadFromLocalStorage, localStorageLoaded, saveToLocalStorage, setupImagePaste)
+port module Ports exposing (exportToPPTX, imagePasted, importPPTXRequested, loadFromLocalStorage, localStorageLoaded, pptxImported, saveToLocalStorage, setupImagePaste)
 
 import Json.Encode as Encode
 
@@ -42,3 +42,17 @@ port localStorageLoaded : (String -> msg) -> Sub msg
 
 
 port exportToPPTX : Encode.Value -> Cmd msg
+
+
+
+-- Outgoing port to request PPTX import (triggers file picker)
+
+
+port importPPTXRequested : () -> Cmd msg
+
+
+
+-- Incoming port to receive imported presentation data from PPTX
+
+
+port pptxImported : (String -> msg) -> Sub msg
