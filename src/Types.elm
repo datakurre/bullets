@@ -68,6 +68,9 @@ type Msg
     | LoadJSONRequested
     | FileSelected File
     | FileLoaded String
+    | ImageUploadRequested
+    | ImageFileSelected File
+    | ImageFileLoaded String
     | KeyPressed String
     | LocalStorageLoaded String
 

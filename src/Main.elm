@@ -317,6 +317,33 @@ update msg model =
             in
             ( { model | presentation = updatedPresentation }, savePresentation updatedPresentation )
 
+        ImageUploadRequested ->
+            ( model, Select.file [ "image/png", "image/jpeg", "image/gif", "image/webp" ] ImageFileSelected )
+
+        ImageFileSelected file ->
+            ( model, Task.perform ImageFileLoaded (File.toUrl file) )
+
+        ImageFileLoaded dataUri ->
+            let
+                presentation =
+                    model.presentation
+
+                updatedSlides =
+                    List.indexedMap
+                        (\i slide ->
+                            if i == model.currentSlideIndex then
+                                { slide | image = Just dataUri }
+
+                            else
+                                slide
+                        )
+                        presentation.slides
+
+                updatedPresentation =
+                    { presentation | slides = updatedSlides }
+            in
+            ( { model | presentation = updatedPresentation }, savePresentation updatedPresentation )
+
         DownloadJSON ->
             let
                 json =

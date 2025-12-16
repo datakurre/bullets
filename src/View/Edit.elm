@@ -98,8 +98,14 @@ viewEditorToolbar slide =
                 , option [ value "markdown-with-image", selected (slide.layout == MarkdownWithImage) ] [ text "Markdown + Image" ]
                 ]
             ]
-        , if slide.image /= Nothing then
-            button [ onClick RemoveImage, class "btn-remove-image" ] [ text "Remove Image" ]
+        , if slide.layout == MarkdownWithImage then
+            div [ class "image-controls" ]
+                [ if slide.image /= Nothing then
+                    button [ onClick RemoveImage, class "btn-remove-image" ] [ text "Remove Image" ]
+
+                  else
+                    button [ onClick ImageUploadRequested, class "btn-upload-image" ] [ text "📁 Upload Image" ]
+                ]
 
           else
             text ""
