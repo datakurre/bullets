@@ -2,6 +2,9 @@
 elm-stuff/
 elm.js
 
+# Vendor libraries
+vendor/
+
 # Agents
 TODO*
 

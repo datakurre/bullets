@@ -1,0 +1,22 @@
+{
+  "name": "bullets",
+  "version": "1.0.0",
+  "description": "A minimal presentation tool built with Elm",
+  "private": true,
+  "scripts": {
+    "install-libs": "mkdir -p vendor && curl -L https://cdn.jsdelivr.net/npm/pptxgenjs@3.12.0/dist/pptxgen.bundle.js -o vendor/pptxgen.bundle.js && curl -L https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js -o vendor/jszip.min.js",
+    "postinstall": "npm run install-libs"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/datakurre/bullets.git"
+  },
+  "keywords": [
+    "presentation",
+    "slides",
+    "elm",
+    "markdown"
+  ],
+  "author": "",
+  "license": "MIT"
+}

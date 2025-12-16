@@ -1,10 +1,11 @@
-.PHONY: init watch build test format clean help
+.PHONY: init watch build test format clean help vendor
 
 help:
 	@echo "bullets - Elm presentation tool"
 	@echo ""
 	@echo "Available targets:"
 	@echo "  make init    - Initialize project dependencies"
+	@echo "  make vendor  - Download vendor JavaScript libraries"
 	@echo "  make watch   - Start development server with auto-reload"
 	@echo "  make build   - Build optimized production bundle"
 	@echo "  make test    - Run test suite"
@@ -17,7 +18,18 @@ init:
 	@echo "Creating source directory structure..."
 	mkdir -p src
 	mkdir -p tests
+	@echo "Downloading vendor libraries..."
+	$(MAKE) vendor
 	@echo "Project initialized!"
+
+vendor:
+	@echo "Downloading vendor JavaScript libraries..."
+	@mkdir -p vendor
+	@echo "Downloading PptxGenJS..."
+	@curl -L -s https://cdn.jsdelivr.net/npm/pptxgenjs@3.12.0/dist/pptxgen.bundle.js -o vendor/pptxgen.bundle.js
+	@echo "Downloading JSZip..."
+	@curl -L -s https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js -o vendor/jszip.min.js
+	@echo "Vendor libraries downloaded!"
 
 watch:
 	@echo "Starting development server..."
