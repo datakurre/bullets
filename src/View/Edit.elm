@@ -41,7 +41,7 @@ viewSlideItem model index slide =
 
         isDragging =
             model.draggedSlideIndex == Just index
-        
+
         showPlaceholder =
             model.dropTargetIndex == Just index && not isDragging
 
@@ -54,13 +54,22 @@ viewSlideItem model index slide =
         className =
             String.join " "
                 [ "slide-item"
-                , if isActive then "active" else ""
-                , if isDragging then "dragging" else ""
+                , if isActive then
+                    "active"
+
+                  else
+                    ""
+                , if isDragging then
+                    "dragging"
+
+                  else
+                    ""
                 ]
     in
     div []
         [ if showPlaceholder then
             div [ class "drop-placeholder" ] []
+
           else
             text ""
         , div
@@ -75,6 +84,12 @@ viewSlideItem model index slide =
             [ div [ class "slide-item-content" ]
                 [ span [ class "slide-number" ] [ text (String.fromInt (index + 1)) ]
                 , span [ class "slide-preview" ] [ text firstLine ]
+                , case slide.image of
+                    Just imageData ->
+                        img [ class "slide-thumbnail", src imageData ] []
+
+                    Nothing ->
+                        text ""
                 ]
             , div [ class "slide-item-actions" ]
                 [ button [ onClick (MoveSlideUp index), class "btn-icon" ] [ text "↑" ]
@@ -139,49 +154,86 @@ viewEditorPreview slide =
     let
         isOnlyTitle =
             isTitleOnly slide.content
-        
+
         isCoverStyle =
             isCoverSlide slide.content
-        
+
         hasContent =
             not (String.isEmpty (String.trim slide.content))
-        
+
         hasImage =
             slide.image /= Nothing
     in
     div [ class "editor-preview" ]
-        [ div [ class ("preview-slide preview-" ++ (if hasImage then "markdown-with-image" else "just-markdown") ++ if isOnlyTitle then " preview-title-centered" else if isCoverStyle then " preview-cover" else "") ]
+        [ div
+            [ class
+                ("preview-slide preview-"
+                    ++ (if hasImage then
+                            "markdown-with-image"
+
+                        else
+                            "just-markdown"
+                       )
+                    ++ (if isOnlyTitle then
+                            " preview-title-centered"
+
+                        else if isCoverStyle then
+                            " preview-cover"
+
+                        else
+                            ""
+                       )
+                )
+            ]
             [ if hasImage then
                 if not hasContent && slide.image /= Nothing then
-                        -- Image only, take full slide
-                        div [ class "preview-image-full" ]
+                    -- Image only, take full slide
+                    div [ class "preview-image-full" ]
+                        [ case slide.image of
+                            Just dataUri ->
+                                img [ src dataUri, class "preview-image-fullscreen" ] []
+
+                            Nothing ->
+                                text ""
+                        ]
+
+                else
+                    -- Normal split layout
+                    div [ class "preview-split" ]
+                        [ div [ class "preview-markdown-left" ]
+                            [ div [ class "markdown-content" ]
+                                [ renderMarkdown slide.content ]
+                            ]
+                        , div [ class "preview-image-right" ]
                             [ case slide.image of
                                 Just dataUri ->
-                                    img [ src dataUri, class "preview-image-fullscreen" ] []
+                                    img [ src dataUri, class "preview-image" ] []
 
                                 Nothing ->
-                                    text ""
+                                    div [ class "image-placeholder" ] [ text "Paste an image here" ]
                             ]
-                    else
-                        -- Normal split layout
-                        div [ class "preview-split" ]
-                            [ div [ class "preview-markdown-left" ]
-                                [ div [ class "markdown-content" ]
-                                    [ renderMarkdown slide.content ]
-                                ]
-                            , div [ class "preview-image-right" ]
-                                [ case slide.image of
-                                    Just dataUri ->
-                                        img [ src dataUri, class "preview-image" ] []
+                        ]
 
-                                    Nothing ->
-                                        div [ class "image-placeholder" ] [ text "Paste an image here" ]
-                                ]
-                            ]
               else
                 -- No image, just markdown
-                div [ class (if isOnlyTitle then "preview-title" else "preview-markdown") ]
-                    [ div [ class (if isOnlyTitle then "title-content" else "markdown-content") ]
+                div
+                    [ class
+                        (if isOnlyTitle then
+                            "preview-title"
+
+                         else
+                            "preview-markdown"
+                        )
+                    ]
+                    [ div
+                        [ class
+                            (if isOnlyTitle then
+                                "title-content"
+
+                             else
+                                "markdown-content"
+                            )
+                        ]
                         [ renderMarkdown slide.content ]
                     ]
             ]
@@ -193,14 +245,14 @@ isTitleOnly content =
     let
         trimmed =
             String.trim content
-        
+
         lines =
             String.lines trimmed
     in
     case lines of
-        [singleLine] ->
+        [ singleLine ] ->
             String.startsWith "#" singleLine
-        
+
         _ ->
             False
 
@@ -210,7 +262,7 @@ isCoverSlide content =
     let
         trimmed =
             String.trim content
-        
+
         lines =
             String.lines trimmed
                 |> List.filter (\line -> not (String.isEmpty (String.trim line)))
@@ -219,6 +271,6 @@ isCoverSlide content =
         firstLine :: rest ->
             -- Check if first line is a heading and there's more content
             String.startsWith "#" firstLine && not (List.isEmpty rest)
-        
+
         _ ->
             False
