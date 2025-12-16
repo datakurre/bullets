@@ -34,17 +34,36 @@ viewSlide slide =
     let
         isOnlyTitle =
             isTitleOnly slide.content
-        
+
         isCoverStyle =
             isCoverSlide slide.content
-        
+
         hasContent =
             not (String.isEmpty (String.trim slide.content))
-        
+
         hasImage =
             slide.image /= Nothing
     in
-    div [ class ("slide slide-" ++ (if hasImage then "markdown-with-image" else "just-markdown") ++ if isOnlyTitle then " slide-title-centered" else if isCoverStyle then " slide-cover" else "") ]
+    div
+        [ class
+            ("slide slide-"
+                ++ (if hasImage then
+                        "markdown-with-image"
+
+                    else
+                        "just-markdown"
+                   )
+                ++ (if isOnlyTitle then
+                        " slide-title-centered"
+
+                    else if isCoverStyle then
+                        " slide-cover"
+
+                    else
+                        ""
+                   )
+            )
+        ]
         [ if hasImage then
             if not hasContent && slide.image /= Nothing then
                 -- Image only, take full slide
@@ -56,6 +75,7 @@ viewSlide slide =
                         Nothing ->
                             text ""
                     ]
+
             else
                 -- Normal split layout
                 div [ class "slide-split" ]
@@ -72,10 +92,27 @@ viewSlide slide =
                                 text ""
                         ]
                     ]
+
           else
             -- No image, just markdown
-            div [ class (if isOnlyTitle then "slide-title" else "slide-markdown") ]
-                [ div [ class (if isOnlyTitle then "title-content" else "markdown-content") ]
+            div
+                [ class
+                    (if isOnlyTitle then
+                        "slide-title"
+
+                     else
+                        "slide-markdown"
+                    )
+                ]
+                [ div
+                    [ class
+                        (if isOnlyTitle then
+                            "title-content"
+
+                         else
+                            "markdown-content"
+                        )
+                    ]
                     [ renderMarkdown slide.content ]
                 ]
         ]
@@ -86,14 +123,14 @@ isTitleOnly content =
     let
         trimmed =
             String.trim content
-        
+
         lines =
             String.lines trimmed
     in
     case lines of
-        [singleLine] ->
+        [ singleLine ] ->
             String.startsWith "#" singleLine
-        
+
         _ ->
             False
 
@@ -103,7 +140,7 @@ isCoverSlide content =
     let
         trimmed =
             String.trim content
-        
+
         lines =
             String.lines trimmed
                 |> List.filter (\line -> not (String.isEmpty (String.trim line)))
@@ -112,7 +149,7 @@ isCoverSlide content =
         firstLine :: rest ->
             -- Check if first line is a heading and there's more content
             String.startsWith "#" firstLine && not (List.isEmpty rest)
-        
+
         _ ->
             False
 

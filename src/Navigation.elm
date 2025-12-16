@@ -1,12 +1,9 @@
-module Navigation exposing
-    ( nextSlide
-    , prevSlide
-    , goToSlide
-    )
+module Navigation exposing (nextSlide, prevSlide, goToSlide)
 
 {-| Navigation functions for slide presentation
 
 @docs nextSlide, prevSlide, goToSlide
+
 -}
 
 

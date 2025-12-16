@@ -2,9 +2,9 @@ module SlideManipulation exposing
     ( addSlide
     , deleteSlide
     , duplicateSlide
-    , moveSlideUp
-    , moveSlideDown
     , moveSlide
+    , moveSlideDown
+    , moveSlideUp
     , swapSlides
     )
 
@@ -25,8 +25,10 @@ addSlide slides =
 
 
 {-| Delete a slide at the given index. Returns the original list if:
-- The index is out of bounds
-- There's only one slide remaining (must have at least one slide)
+
+  - The index is out of bounds
+  - There's only one slide remaining (must have at least one slide)
+
 -}
 deleteSlide : Int -> List Slide -> List Slide
 deleteSlide index slides =
