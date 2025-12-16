@@ -414,17 +414,17 @@ update msg model =
         DragStart index ->
             ( { model | draggedSlideIndex = Just index }, Cmd.none )
 
-        DragOver ->
-            ( model, Cmd.none )
+        DragOver targetIndex ->
+            ( { model | dropTargetIndex = Just targetIndex }, Cmd.none )
 
         DragEnd ->
-            ( { model | draggedSlideIndex = Nothing }, Cmd.none )
+            ( { model | draggedSlideIndex = Nothing, dropTargetIndex = Nothing }, Cmd.none )
 
         Drop targetIndex ->
             case model.draggedSlideIndex of
                 Just sourceIndex ->
                     if sourceIndex == targetIndex then
-                        ( { model | draggedSlideIndex = Nothing }, Cmd.none )
+                        ( { model | draggedSlideIndex = Nothing, dropTargetIndex = Nothing }, Cmd.none )
 
                     else
                         let
@@ -455,12 +455,13 @@ update msg model =
                             | presentation = updatedPresentation
                             , currentSlideIndex = newCurrentIndex
                             , draggedSlideIndex = Nothing
+                            , dropTargetIndex = Nothing
                           }
                         , savePresentation updatedPresentation
                         )
 
                 Nothing ->
-                    ( { model | draggedSlideIndex = Nothing }, Cmd.none )
+                    ( { model | draggedSlideIndex = Nothing, dropTargetIndex = Nothing }, Cmd.none )
 
         LocalStorageLoaded content ->
             if String.isEmpty content then

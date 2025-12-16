@@ -61,7 +61,7 @@ viewSlideItem model index slide =
         , draggable "true"
         , on "dragstart" (Decode.succeed (DragStart index))
         , on "dragend" (Decode.succeed DragEnd)
-        , preventDefaultOn "dragover" (Decode.succeed ( DragOver, True ))
+        , preventDefaultOn "dragover" (Decode.succeed ( DragOver index, True ))
         , on "drop" (Decode.succeed (Drop index))
         ]
         [ div [ class "slide-item-content" ]
