@@ -2,7 +2,7 @@ module Main exposing (main)
 
 import Browser
 import Browser.Events
-import File exposing (File)
+import File
 import File.Download as Download
 import File.Select as Select
 import Html exposing (Html, div)
@@ -14,9 +14,10 @@ import Navigation
 import Ports
 import SlideManipulation
 import Task
-import Types exposing (Mode(..), Model, Msg(..), Presentation, Slide, SlideLayout(..), initialModel)
+import Types exposing (Mode(..), Model, Msg(..), Presentation, initialModel)
 import View.Edit exposing (viewEditMode)
 import View.Present exposing (viewPresentMode)
+
 
 
 -- MAIN
@@ -92,7 +93,7 @@ update msg model =
 
                 newIndex =
                     List.length updatedSlides - 1
-                    
+
                 newSlide =
                     List.drop newIndex updatedSlides
                         |> List.head
