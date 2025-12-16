@@ -5,8 +5,8 @@ import Browser.Events
 import File
 import File.Download as Download
 import File.Select as Select
-import Html exposing (Html, button, div, h2, h3, span, text)
-import Html.Attributes exposing (class)
+import Html exposing (Html, a, button, div, h2, h3, span, text)
+import Html.Attributes exposing (class, href)
 import Html.Events exposing (custom, onClick)
 import Json as AppJson
 import Json.Decode as Decode
@@ -656,7 +656,8 @@ keyDecoder =
 view : Model -> Html Msg
 view model =
     div [ class "app" ]
-        [ case model.mode of
+        [ viewSkipLink
+        , case model.mode of
             Edit ->
                 viewEditMode model
 
@@ -669,6 +670,11 @@ view model =
             text ""
         , viewLiveRegion model.announcement
         ]
+
+
+viewSkipLink : Html msg
+viewSkipLink =
+    a [ class "skip-link", href "#main-content" ] [ text "Skip to main content" ]
 
 
 viewLiveRegion : String -> Html msg

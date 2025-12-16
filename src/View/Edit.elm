@@ -128,14 +128,14 @@ viewEditor model =
     in
     case currentSlide of
         Just slide ->
-            main_ [ class "editor", attribute "role" "main", attribute "aria-label" "Slide editor" ]
+            main_ [ class "editor", attribute "role" "main", attribute "aria-label" "Slide editor", attribute "id" "main-content" ]
                 [ viewEditorToolbar slide
                 , viewEditorMain slide
                 , viewEditorPreview slide
                 ]
 
         Nothing ->
-            main_ [ class "editor" ]
+            main_ [ class "editor", attribute "id" "main-content" ]
                 [ text "No slide selected" ]
 
 

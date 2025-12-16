@@ -19,13 +19,13 @@ viewPresentMode model =
     in
     case currentSlide of
         Just slide ->
-            main_ [ class "present-mode", attribute "role" "main", attribute "aria-label" "Presentation" ]
+            main_ [ class "present-mode", attribute "role" "main", attribute "aria-label" "Presentation", attribute "id" "main-content" ]
                 [ viewSlide slide
                 , viewPresentControls model.currentSlideIndex totalSlides
                 ]
 
         Nothing ->
-            main_ [ class "present-mode" ]
+            main_ [ class "present-mode", attribute "id" "main-content" ]
                 [ text "No slide to display" ]
 
 
