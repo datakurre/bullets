@@ -288,6 +288,33 @@
             object-fit: contain;
         }
 
+        /* Title-centered variant for single-line titles */
+        .slide-title-centered .slide-title {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+        }
+
+        .slide-title-centered .title-content {
+            font-size: 4rem;
+        }
+
+        /* Full-width image when no content */
+        .slide-image-full {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .slide-image-fullscreen {
+            max-width: 90%;
+            max-height: 80vh;
+            object-fit: contain;
+        }
+
         .present-controls {
             position: fixed;
             bottom: 2rem;

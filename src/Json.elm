@@ -38,9 +38,6 @@ encodeSlide slide =
 encodeSlideLayout : SlideLayout -> Encode.Value
 encodeSlideLayout layout =
     case layout of
-        TitleOnly ->
-            Encode.string "title-only"
-
         JustMarkdown ->
             Encode.string "just-markdown"
 
@@ -76,7 +73,8 @@ decodeSlideLayout =
             (\str ->
                 case str of
                     "title-only" ->
-                        Decode.succeed TitleOnly
+                        -- Legacy format, convert to JustMarkdown
+                        Decode.succeed JustMarkdown
 
                     "just-markdown" ->
                         Decode.succeed JustMarkdown

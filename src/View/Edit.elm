@@ -93,8 +93,7 @@ viewEditorToolbar slide =
         [ div [ class "layout-selector" ]
             [ text "Layout: "
             , select [ onInput layoutFromString ]
-                [ option [ value "title-only", selected (slide.layout == TitleOnly) ] [ text "Title Only" ]
-                , option [ value "just-markdown", selected (slide.layout == JustMarkdown) ] [ text "Markdown" ]
+                [ option [ value "just-markdown", selected (slide.layout == JustMarkdown) ] [ text "Markdown" ]
                 , option [ value "markdown-with-image", selected (slide.layout == MarkdownWithImage) ] [ text "Markdown + Image" ]
                 ]
             ]
@@ -115,9 +114,6 @@ viewEditorToolbar slide =
 layoutFromString : String -> Msg
 layoutFromString str =
     case str of
-        "title-only" ->
-            ChangeLayout TitleOnly
-
         "just-markdown" ->
             ChangeLayout JustMarkdown
 
@@ -143,15 +139,15 @@ viewEditorMain slide =
 
 viewEditorPreview : Slide -> Html Msg
 viewEditorPreview slide =
+    let
+        isOnlyTitle =
+            isTitleOnly slide.content
+    in
     div [ class "editor-preview" ]
-        [ div [ class ("preview-" ++ layoutClass slide.layout) ]
+        [ div [ class ("preview-" ++ layoutClass slide.layout ++ if isOnlyTitle then " preview-title-centered" else "") ]
             [ case slide.layout of
-                TitleOnly ->
-                    div [ class "preview-title" ]
-                        [ renderMarkdown slide.content ]
-
                 JustMarkdown ->
-                    div [ class "preview-markdown" ]
+                    div [ class (if isOnlyTitle then "preview-title" else "preview-markdown") ]
                         [ renderMarkdown slide.content ]
 
                 MarkdownWithImage ->
@@ -171,12 +167,26 @@ viewEditorPreview slide =
         ]
 
 
+isTitleOnly : String -> Bool
+isTitleOnly content =
+    let
+        trimmed =
+            String.trim content
+        
+        lines =
+            String.lines trimmed
+    in
+    case lines of
+        [singleLine] ->
+            String.startsWith "#" singleLine
+        
+        _ ->
+            False
+
+
 layoutClass : SlideLayout -> String
 layoutClass layout =
     case layout of
-        TitleOnly ->
-            "title"
-
         JustMarkdown ->
             "markdown"
 

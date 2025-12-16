@@ -21,8 +21,7 @@ type Mode
 
 
 type SlideLayout
-    = TitleOnly
-    | JustMarkdown
+    = JustMarkdown
     | MarkdownWithImage
 
 

@@ -31,36 +31,66 @@ viewPresentMode model =
 
 viewSlide : Slide -> Html Msg
 viewSlide slide =
-    div [ class ("slide slide-" ++ layoutClass slide.layout) ]
+    let
+        isOnlyTitle =
+            isTitleOnly slide.content
+        
+        hasContent =
+            not (String.isEmpty (String.trim slide.content))
+    in
+    div [ class ("slide slide-" ++ layoutClass slide.layout ++ if isOnlyTitle then " slide-title-centered" else "") ]
         [ case slide.layout of
-            TitleOnly ->
-                div [ class "slide-title" ]
-                    [ div [ class "title-content" ]
-                        [ renderMarkdown slide.content ]
-                    ]
-
             JustMarkdown ->
-                div [ class "slide-markdown" ]
-                    [ div [ class "markdown-content" ]
+                div [ class (if isOnlyTitle then "slide-title" else "slide-markdown") ]
+                    [ div [ class (if isOnlyTitle then "title-content" else "markdown-content") ]
                         [ renderMarkdown slide.content ]
                     ]
 
             MarkdownWithImage ->
-                div [ class "slide-split" ]
-                    [ div [ class "slide-markdown-left" ]
-                        [ div [ class "markdown-content" ]
-                            [ renderMarkdown slide.content ]
-                        ]
-                    , div [ class "slide-image-right" ]
+                if not hasContent && slide.image /= Nothing then
+                    -- Image only, take full slide
+                    div [ class "slide-image-full" ]
                         [ case slide.image of
                             Just dataUri ->
-                                img [ src dataUri, class "slide-image" ] []
+                                img [ src dataUri, class "slide-image-fullscreen" ] []
 
                             Nothing ->
                                 text ""
                         ]
-                    ]
+                else
+                    -- Normal split layout
+                    div [ class "slide-split" ]
+                        [ div [ class "slide-markdown-left" ]
+                            [ div [ class "markdown-content" ]
+                                [ renderMarkdown slide.content ]
+                            ]
+                        , div [ class "slide-image-right" ]
+                            [ case slide.image of
+                                Just dataUri ->
+                                    img [ src dataUri, class "slide-image" ] []
+
+                                Nothing ->
+                                    text ""
+                            ]
+                        ]
         ]
+
+
+isTitleOnly : String -> Bool
+isTitleOnly content =
+    let
+        trimmed =
+            String.trim content
+        
+        lines =
+            String.lines trimmed
+    in
+    case lines of
+        [singleLine] ->
+            String.startsWith "#" singleLine
+        
+        _ ->
+            False
 
 
 viewPresentControls : Int -> Int -> Html Msg
@@ -79,9 +109,6 @@ viewPresentControls currentIndex totalSlides =
 layoutClass : SlideLayout -> String
 layoutClass layout =
     case layout of
-        TitleOnly ->
-            "title"
-
         JustMarkdown ->
             "markdown"
 
