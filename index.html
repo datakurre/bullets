@@ -211,13 +211,57 @@
             line-height: 1.6;
         }
 
-        .preview-split {
+        .preview-slide {
+            width: 100%;
+            height: 100%;
             display: flex;
-            gap: 1rem;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .preview-title {
+            text-align: center;
+            width: 100%;
+        }
+
+        .preview-title .title-content {
+            font-size: 2rem;
+            font-weight: 700;
+            line-height: 1.2;
+        }
+
+        .preview-title-centered .preview-title {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+        }
+
+        .preview-title-centered .title-content {
+            font-size: 2.5rem;
         }
 
         .preview-markdown {
+            width: 100%;
+        }
+
+        .preview-markdown .markdown-content {
+            font-size: 1rem;
+            line-height: 1.6;
+        }
+
+        .preview-split {
+            display: flex;
+            gap: 1rem;
+            width: 100%;
+        }
+
+        .preview-markdown-left {
             flex: 1;
+        }
+
+        .preview-markdown-left .markdown-content {
+            font-size: 0.9rem;
         }
 
         /* Preview typography */
@@ -227,10 +271,22 @@
             margin-bottom: 0.5rem;
         }
 
+        .preview-markdown .markdown-content h1 { font-size: 1.5rem; }
+        .preview-markdown .markdown-content h2 { font-size: 1.25rem; }
+        .preview-markdown .markdown-content h3 { font-size: 1.1rem; }
+
+        .preview-markdown .markdown-content p {
+            margin-bottom: 0.5rem;
+        }
+
         .preview-markdown ul,
         .preview-markdown ol {
             margin-left: 1.5rem;
             margin-bottom: 0.5rem;
+        }
+
+        .preview-markdown .markdown-content li {
+            margin-bottom: 0.3rem;
         }
 
         .preview-markdown ul {
@@ -243,6 +299,52 @@
             margin-left: -1.5rem;
             display: inline-block;
             width: 1rem;
+        }
+
+        .preview-image-right {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .preview-image-right img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+
+        /* Cover slide style for preview */
+        .preview-cover .preview-markdown {
+            text-align: center;
+        }
+
+        .preview-cover .markdown-content h1,
+        .preview-cover .markdown-content h2 {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            font-weight: 700;
+        }
+
+        .preview-cover .markdown-content p {
+            font-size: 1.2rem;
+            line-height: 1.4;
+            color: #444;
+        }
+
+        /* Full-width image in preview when no content */
+        .preview-image-full {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .preview-image-fullscreen {
+            max-width: 90%;
+            max-height: 90%;
+            object-fit: contain;
         }
 
         .preview-image {

@@ -142,27 +142,49 @@ viewEditorPreview slide =
     let
         isOnlyTitle =
             isTitleOnly slide.content
+        
+        isCoverStyle =
+            isCoverSlide slide.content
+        
+        hasContent =
+            not (String.isEmpty (String.trim slide.content))
     in
     div [ class "editor-preview" ]
-        [ div [ class ("preview-" ++ layoutClass slide.layout ++ if isOnlyTitle then " preview-title-centered" else "") ]
+        [ div [ class ("preview-slide preview-" ++ layoutClass slide.layout ++ if isOnlyTitle then " preview-title-centered" else if isCoverStyle then " preview-cover" else "") ]
             [ case slide.layout of
                 JustMarkdown ->
                     div [ class (if isOnlyTitle then "preview-title" else "preview-markdown") ]
-                        [ renderMarkdown slide.content ]
+                        [ div [ class (if isOnlyTitle then "title-content" else "markdown-content") ]
+                            [ renderMarkdown slide.content ]
+                        ]
 
                 MarkdownWithImage ->
-                    div [ class "preview-split" ]
-                        [ div [ class "preview-markdown" ]
-                            [ renderMarkdown slide.content ]
-                        , div [ class "preview-image" ]
+                    if not hasContent && slide.image /= Nothing then
+                        -- Image only, take full slide
+                        div [ class "preview-image-full" ]
                             [ case slide.image of
                                 Just dataUri ->
-                                    img [ src dataUri ] []
+                                    img [ src dataUri, class "preview-image-fullscreen" ] []
 
                                 Nothing ->
-                                    div [ class "image-placeholder" ] [ text "Paste an image here" ]
+                                    text ""
                             ]
-                        ]
+                    else
+                        -- Normal split layout
+                        div [ class "preview-split" ]
+                            [ div [ class "preview-markdown-left" ]
+                                [ div [ class "markdown-content" ]
+                                    [ renderMarkdown slide.content ]
+                                ]
+                            , div [ class "preview-image-right" ]
+                                [ case slide.image of
+                                    Just dataUri ->
+                                        img [ src dataUri, class "preview-image" ] []
+
+                                    Nothing ->
+                                        div [ class "image-placeholder" ] [ text "Paste an image here" ]
+                                ]
+                            ]
             ]
         ]
 
@@ -179,6 +201,25 @@ isTitleOnly content =
     case lines of
         [singleLine] ->
             String.startsWith "#" singleLine
+        
+        _ ->
+            False
+
+
+isCoverSlide : String -> Bool
+isCoverSlide content =
+    let
+        trimmed =
+            String.trim content
+        
+        lines =
+            String.lines trimmed
+                |> List.filter (\line -> not (String.isEmpty (String.trim line)))
+    in
+    case lines of
+        firstLine :: rest ->
+            -- Check if first line is a heading and there's more content
+            String.startsWith "#" firstLine && not (List.isEmpty rest)
         
         _ ->
             False
