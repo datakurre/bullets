@@ -7,7 +7,6 @@ It provides a single entry point for all state updates in the application.
 
 -}
 
-import File
 import Types exposing (Model, Msg(..))
 import Update.Content
 import Update.FileIO
