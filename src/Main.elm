@@ -433,6 +433,23 @@ update msg model =
                             in
                             update (GoToSlide newIndex) model
 
+                        "ArrowDown" ->
+                            let
+                                maxIndex =
+                                    List.length model.presentation.slides - 1
+
+                                newIndex =
+                                    min maxIndex (model.currentSlideIndex + 1)
+                            in
+                            update (GoToSlide newIndex) model
+
+                        "ArrowUp" ->
+                            let
+                                newIndex =
+                                    max 0 (model.currentSlideIndex - 1)
+                            in
+                            update (GoToSlide newIndex) model
+
                         "p" ->
                             update EnterPresentMode model
 
@@ -542,14 +559,9 @@ savePresentation presentation =
 
 
 subscriptions : Model -> Sub Msg
-subscriptions model =
+subscriptions _ =
     Sub.batch
-        [ case model.mode of
-            Present ->
-                Browser.Events.onKeyDown keyDecoder
-
-            Edit ->
-                Sub.none
+        [ Browser.Events.onKeyDown keyDecoder
         , Ports.imagePasted ImagePasted
         , Ports.localStorageLoaded LocalStorageLoaded
         ]
