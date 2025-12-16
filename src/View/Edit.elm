@@ -1,7 +1,7 @@
 module View.Edit exposing (viewEditMode)
 
 import Html exposing (Html, button, div, h3, img, option, select, span, text, textarea)
-import Html.Attributes exposing (attribute, class, draggable, placeholder, selected, src, value)
+import Html.Attributes exposing (class, draggable, placeholder, selected, src, value)
 import Html.Events exposing (on, onClick, onInput, preventDefaultOn)
 import Json.Decode as Decode
 import MarkdownView exposing (renderMarkdown)
@@ -61,7 +61,7 @@ viewSlideItem model index slide =
         , draggable "true"
         , on "dragstart" (Decode.succeed (DragStart index))
         , on "dragend" (Decode.succeed DragEnd)
-        , preventDefaultOn "dragover" (Decode.succeed ( DragOver index, True ))
+        , preventDefaultOn "dragover" (Decode.succeed ( DragOver, True ))
         , on "drop" (Decode.succeed (Drop index))
         ]
         [ div [ class "slide-item-content" ]

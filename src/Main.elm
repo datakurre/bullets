@@ -452,7 +452,7 @@ update msg model =
         DragStart index ->
             ( { model | draggedSlideIndex = Just index }, Cmd.none )
 
-        DragOver index ->
+        DragOver ->
             ( model, Cmd.none )
 
         DragEnd ->

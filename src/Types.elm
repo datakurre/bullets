@@ -74,7 +74,7 @@ type Msg
     | KeyPressed String
     | LocalStorageLoaded String
     | DragStart Int
-    | DragOver Int
+    | DragOver
     | DragEnd
     | Drop Int
 
