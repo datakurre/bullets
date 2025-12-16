@@ -41,6 +41,9 @@ viewSlideItem model index slide =
 
         isDragging =
             model.draggedSlideIndex == Just index
+        
+        showPlaceholder =
+            model.dropTargetIndex == Just index && not isDragging
 
         firstLine =
             String.lines slide.content
@@ -55,24 +58,30 @@ viewSlideItem model index slide =
                 , if isDragging then "dragging" else ""
                 ]
     in
-    div
-        [ class className
-        , onClick (GoToSlide index)
-        , draggable "true"
-        , on "dragstart" (Decode.succeed (DragStart index))
-        , on "dragend" (Decode.succeed DragEnd)
-        , preventDefaultOn "dragover" (Decode.succeed ( DragOver index, True ))
-        , on "drop" (Decode.succeed (Drop index))
-        ]
-        [ div [ class "slide-item-content" ]
-            [ span [ class "slide-number" ] [ text (String.fromInt (index + 1)) ]
-            , span [ class "slide-preview" ] [ text firstLine ]
+    div []
+        [ if showPlaceholder then
+            div [ class "drop-placeholder" ] []
+          else
+            text ""
+        , div
+            [ class className
+            , onClick (GoToSlide index)
+            , draggable "true"
+            , on "dragstart" (Decode.succeed (DragStart index))
+            , on "dragend" (Decode.succeed DragEnd)
+            , preventDefaultOn "dragover" (Decode.succeed ( DragOver index, True ))
+            , on "drop" (Decode.succeed (Drop index))
             ]
-        , div [ class "slide-item-actions" ]
-            [ button [ onClick (MoveSlideUp index), class "btn-icon" ] [ text "↑" ]
-            , button [ onClick (MoveSlideDown index), class "btn-icon" ] [ text "↓" ]
-            , button [ onClick (DuplicateSlide index), class "btn-icon" ] [ text "⎘" ]
-            , button [ onClick (DeleteSlide index), class "btn-icon btn-danger" ] [ text "×" ]
+            [ div [ class "slide-item-content" ]
+                [ span [ class "slide-number" ] [ text (String.fromInt (index + 1)) ]
+                , span [ class "slide-preview" ] [ text firstLine ]
+                ]
+            , div [ class "slide-item-actions" ]
+                [ button [ onClick (MoveSlideUp index), class "btn-icon" ] [ text "↑" ]
+                , button [ onClick (MoveSlideDown index), class "btn-icon" ] [ text "↓" ]
+                , button [ onClick (DuplicateSlide index), class "btn-icon" ] [ text "⎘" ]
+                , button [ onClick (DeleteSlide index), class "btn-icon btn-danger" ] [ text "×" ]
+                ]
             ]
         ]
 
