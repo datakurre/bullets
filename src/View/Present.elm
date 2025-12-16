@@ -1,8 +1,9 @@
 module View.Present exposing (viewPresentMode)
 
-import Html exposing (Html, button, div, img, pre, text)
+import Html exposing (Html, button, div, img, text)
 import Html.Attributes exposing (class, src)
 import Html.Events exposing (onClick)
+import MarkdownView exposing (renderMarkdown)
 import Types exposing (Model, Msg(..), Slide, SlideLayout(..))
 
 
@@ -34,16 +35,22 @@ viewSlide slide =
         [ case slide.layout of
             TitleOnly ->
                 div [ class "slide-title" ]
-                    [ pre [ class "title-content" ] [ text slide.content ] ]
+                    [ div [ class "title-content" ] 
+                        [ renderMarkdown slide.content ]
+                    ]
 
             JustMarkdown ->
                 div [ class "slide-markdown" ]
-                    [ pre [ class "markdown-content" ] [ text slide.content ] ]
+                    [ div [ class "markdown-content" ] 
+                        [ renderMarkdown slide.content ]
+                    ]
 
             MarkdownWithImage ->
                 div [ class "slide-split" ]
                     [ div [ class "slide-markdown-left" ]
-                        [ pre [ class "markdown-content" ] [ text slide.content ] ]
+                        [ div [ class "markdown-content" ] 
+                            [ renderMarkdown slide.content ]
+                        ]
                     , div [ class "slide-image-right" ]
                         [ case slide.image of
                             Just dataUri ->

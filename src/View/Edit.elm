@@ -1,8 +1,9 @@
 module View.Edit exposing (viewEditMode)
 
-import Html exposing (Html, button, div, h3, img, option, pre, select, span, text, textarea)
+import Html exposing (Html, button, div, h3, img, option, select, span, text, textarea)
 import Html.Attributes exposing (class, placeholder, selected, src, value)
 import Html.Events exposing (onClick, onInput)
+import MarkdownView exposing (renderMarkdown)
 import Types exposing (Model, Msg(..), Slide, SlideLayout(..))
 
 
@@ -141,16 +142,16 @@ viewEditorPreview slide =
             [ case slide.layout of
                 TitleOnly ->
                     div [ class "preview-title" ]
-                        [ pre [] [ text slide.content ] ]
+                        [ renderMarkdown slide.content ]
 
                 JustMarkdown ->
                     div [ class "preview-markdown" ]
-                        [ pre [] [ text slide.content ] ]
+                        [ renderMarkdown slide.content ]
 
                 MarkdownWithImage ->
                     div [ class "preview-split" ]
                         [ div [ class "preview-markdown" ]
-                            [ pre [] [ text slide.content ] ]
+                            [ renderMarkdown slide.content ]
                         , div [ class "preview-image" ]
                             [ case slide.image of
                                 Just dataUri ->
