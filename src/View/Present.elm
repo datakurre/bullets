@@ -35,20 +35,20 @@ viewSlide slide =
         [ case slide.layout of
             TitleOnly ->
                 div [ class "slide-title" ]
-                    [ div [ class "title-content" ] 
+                    [ div [ class "title-content" ]
                         [ renderMarkdown slide.content ]
                     ]
 
             JustMarkdown ->
                 div [ class "slide-markdown" ]
-                    [ div [ class "markdown-content" ] 
+                    [ div [ class "markdown-content" ]
                         [ renderMarkdown slide.content ]
                     ]
 
             MarkdownWithImage ->
                 div [ class "slide-split" ]
                     [ div [ class "slide-markdown-left" ]
-                        [ div [ class "markdown-content" ] 
+                        [ div [ class "markdown-content" ]
                             [ renderMarkdown slide.content ]
                         ]
                     , div [ class "slide-image-right" ]
