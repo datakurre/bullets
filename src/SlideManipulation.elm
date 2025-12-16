@@ -4,6 +4,7 @@ module SlideManipulation exposing
     , duplicateSlide
     , moveSlideUp
     , moveSlideDown
+    , moveSlide
     , swapSlides
     )
 
@@ -128,3 +129,46 @@ swapSlides i j slides =
 
         _ ->
             slides
+
+
+{-| Move a slide from source index to target index.
+Returns the original list if either index is out of bounds.
+-}
+moveSlide : Int -> Int -> List Slide -> List Slide
+moveSlide sourceIndex targetIndex slides =
+    let
+        maxIndex =
+            List.length slides - 1
+    in
+    if sourceIndex < 0 || sourceIndex > maxIndex || targetIndex < 0 || targetIndex > maxIndex then
+        slides
+
+    else if sourceIndex == targetIndex then
+        slides
+
+    else
+        let
+            maybeSlide =
+                List.drop sourceIndex slides
+                    |> List.head
+        in
+        case maybeSlide of
+            Just slide ->
+                let
+                    -- Remove the slide from the source position
+                    withoutSlide =
+                        List.indexedMap Tuple.pair slides
+                            |> List.filter (\( i, _ ) -> i /= sourceIndex)
+                            |> List.map Tuple.second
+
+                    -- Insert at target position
+                    before =
+                        List.take targetIndex withoutSlide
+
+                    after =
+                        List.drop targetIndex withoutSlide
+                in
+                before ++ [ slide ] ++ after
+
+            Nothing ->
+                slides

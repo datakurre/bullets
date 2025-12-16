@@ -449,6 +449,57 @@ update msg model =
                         _ ->
                             ( model, Cmd.none )
 
+        DragStart index ->
+            ( { model | draggedSlideIndex = Just index }, Cmd.none )
+
+        DragOver index ->
+            ( model, Cmd.none )
+
+        DragEnd ->
+            ( { model | draggedSlideIndex = Nothing }, Cmd.none )
+
+        Drop targetIndex ->
+            case model.draggedSlideIndex of
+                Just sourceIndex ->
+                    if sourceIndex == targetIndex then
+                        ( { model | draggedSlideIndex = Nothing }, Cmd.none )
+
+                    else
+                        let
+                            presentation =
+                                model.presentation
+
+                            updatedSlides =
+                                SlideManipulation.moveSlide sourceIndex targetIndex presentation.slides
+
+                            updatedPresentation =
+                                { presentation | slides = updatedSlides }
+
+                            -- Calculate new current slide index
+                            newCurrentIndex =
+                                if model.currentSlideIndex == sourceIndex then
+                                    targetIndex
+
+                                else if sourceIndex < model.currentSlideIndex && targetIndex >= model.currentSlideIndex then
+                                    model.currentSlideIndex - 1
+
+                                else if sourceIndex > model.currentSlideIndex && targetIndex <= model.currentSlideIndex then
+                                    model.currentSlideIndex + 1
+
+                                else
+                                    model.currentSlideIndex
+                        in
+                        ( { model
+                            | presentation = updatedPresentation
+                            , currentSlideIndex = newCurrentIndex
+                            , draggedSlideIndex = Nothing
+                          }
+                        , savePresentation updatedPresentation
+                        )
+
+                Nothing ->
+                    ( { model | draggedSlideIndex = Nothing }, Cmd.none )
+
         LocalStorageLoaded content ->
             if String.isEmpty content then
                 ( model, Cmd.none )

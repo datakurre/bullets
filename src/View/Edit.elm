@@ -1,8 +1,9 @@
 module View.Edit exposing (viewEditMode)
 
 import Html exposing (Html, button, div, h3, img, option, select, span, text, textarea)
-import Html.Attributes exposing (class, placeholder, selected, src, value)
-import Html.Events exposing (onClick, onInput)
+import Html.Attributes exposing (attribute, class, draggable, placeholder, selected, src, value)
+import Html.Events exposing (on, onClick, onInput, preventDefaultOn)
+import Json.Decode as Decode
 import MarkdownView exposing (renderMarkdown)
 import Types exposing (Model, Msg(..), Slide, SlideLayout(..))
 
@@ -23,7 +24,7 @@ viewSidebar model =
             , button [ onClick AddSlide, class "btn-add" ] [ text "+" ]
             ]
         , div [ class "slide-list" ]
-            (List.indexedMap (viewSlideItem model.currentSlideIndex) model.presentation.slides)
+            (List.indexedMap (viewSlideItem model) model.presentation.slides)
         , div [ class "sidebar-footer" ]
             [ button [ onClick EnterPresentMode, class "btn-present" ] [ text "▶ Present" ]
             , button [ onClick LoadJSONRequested, class "btn-load" ] [ text "📁 Load" ]
@@ -32,27 +33,36 @@ viewSidebar model =
         ]
 
 
-viewSlideItem : Int -> Int -> Slide -> Html Msg
-viewSlideItem currentIndex index slide =
+viewSlideItem : Model -> Int -> Slide -> Html Msg
+viewSlideItem model index slide =
     let
         isActive =
-            index == currentIndex
+            index == model.currentSlideIndex
+
+        isDragging =
+            model.draggedSlideIndex == Just index
 
         firstLine =
             String.lines slide.content
                 |> List.head
                 |> Maybe.withDefault "Empty slide"
                 |> String.left 30
+
+        className =
+            String.join " "
+                [ "slide-item"
+                , if isActive then "active" else ""
+                , if isDragging then "dragging" else ""
+                ]
     in
     div
-        [ class
-            (if isActive then
-                "slide-item active"
-
-             else
-                "slide-item"
-            )
+        [ class className
         , onClick (GoToSlide index)
+        , draggable "true"
+        , on "dragstart" (Decode.succeed (DragStart index))
+        , on "dragend" (Decode.succeed DragEnd)
+        , preventDefaultOn "dragover" (Decode.succeed ( DragOver index, True ))
+        , on "drop" (Decode.succeed (Drop index))
         ]
         [ div [ class "slide-item-content" ]
             [ span [ class "slide-number" ] [ text (String.fromInt (index + 1)) ]

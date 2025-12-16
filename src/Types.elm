@@ -45,6 +45,7 @@ type alias Model =
     , currentSlideIndex : Int
     , presentation : Presentation
     , editingContent : String
+    , draggedSlideIndex : Maybe Int
     }
 
 
@@ -72,6 +73,10 @@ type Msg
     | ImageFileLoaded String
     | KeyPressed String
     | LocalStorageLoaded String
+    | DragStart Int
+    | DragOver Int
+    | DragEnd
+    | Drop Int
 
 
 
@@ -101,4 +106,5 @@ initialModel =
     , currentSlideIndex = 0
     , presentation = initialPresentation
     , editingContent = initialSlide.content
+    , draggedSlideIndex = Nothing
     }

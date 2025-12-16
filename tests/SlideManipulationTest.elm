@@ -289,4 +289,90 @@ suite =
                     in
                     Expect.equal result [ slide2, slide1 ]
             ]
+        , describe "moveSlide"
+            [ test "moves slide forward" <|
+                \_ ->
+                    let
+                        slides = [ makeSlide "First", makeSlide "Second", makeSlide "Third" ]
+                        result = moveSlide 0 2 slides
+                    in
+                    Expect.equal result [ makeSlide "Second", makeSlide "Third", makeSlide "First" ]
+            , test "moves slide backward" <|
+                \_ ->
+                    let
+                        slides = [ makeSlide "First", makeSlide "Second", makeSlide "Third" ]
+                        result = moveSlide 2 0 slides
+                    in
+                    Expect.equal result [ makeSlide "Third", makeSlide "First", makeSlide "Second" ]
+            , test "moving to same position returns original" <|
+                \_ ->
+                    let
+                        slides = [ makeSlide "First", makeSlide "Second", makeSlide "Third" ]
+                        result = moveSlide 1 1 slides
+                    in
+                    Expect.equal result slides
+            , test "moves slide one position forward" <|
+                \_ ->
+                    let
+                        slides = [ makeSlide "First", makeSlide "Second", makeSlide "Third" ]
+                        result = moveSlide 0 1 slides
+                    in
+                    Expect.equal result [ makeSlide "Second", makeSlide "First", makeSlide "Third" ]
+            , test "moves slide one position backward" <|
+                \_ ->
+                    let
+                        slides = [ makeSlide "First", makeSlide "Second", makeSlide "Third" ]
+                        result = moveSlide 1 0 slides
+                    in
+                    Expect.equal result [ makeSlide "Second", makeSlide "First", makeSlide "Third" ]
+            , test "moves last slide to first position" <|
+                \_ ->
+                    let
+                        slides = [ makeSlide "First", makeSlide "Second", makeSlide "Third" ]
+                        result = moveSlide 2 0 slides
+                    in
+                    Expect.equal result [ makeSlide "Third", makeSlide "First", makeSlide "Second" ]
+            , test "out of bounds source index returns original" <|
+                \_ ->
+                    let
+                        slides = [ makeSlide "First", makeSlide "Second" ]
+                        result = moveSlide 5 0 slides
+                    in
+                    Expect.equal result slides
+            , test "out of bounds target index returns original" <|
+                \_ ->
+                    let
+                        slides = [ makeSlide "First", makeSlide "Second" ]
+                        result = moveSlide 0 5 slides
+                    in
+                    Expect.equal result slides
+            , test "negative source index returns original" <|
+                \_ ->
+                    let
+                        slides = [ makeSlide "First", makeSlide "Second" ]
+                        result = moveSlide -1 0 slides
+                    in
+                    Expect.equal result slides
+            , test "negative target index returns original" <|
+                \_ ->
+                    let
+                        slides = [ makeSlide "First", makeSlide "Second" ]
+                        result = moveSlide 0 -1 slides
+                    in
+                    Expect.equal result slides
+            , test "preserves all slide properties" <|
+                \_ ->
+                    let
+                        slide1 = makeSlide "Content 1"
+                        slide2 = 
+                            { content = "Content 2"
+                            , layout = MarkdownWithImage
+                            , image = Just "data:image/png;base64,test"
+                            }
+                        slide3 = makeSlide "Content 3"
+                        slides = [ slide1, slide2, slide3 ]
+                        result = moveSlide 1 0 slides
+                    in
+                    Expect.equal result [ slide2, slide1, slide3 ]
+            ]
         ]
