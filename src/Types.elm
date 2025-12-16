@@ -81,6 +81,8 @@ type Msg
     | TextareaFocused
     | TextareaBlurred
     | ExportToPPTX
+    | ImportPPTXRequested
+    | PPTXImported String
 
 
 

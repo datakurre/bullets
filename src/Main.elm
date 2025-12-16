@@ -559,6 +559,29 @@ update msg model =
             in
             ( model, Ports.exportToPPTX json )
 
+        ImportPPTXRequested ->
+            ( model, Ports.importPPTXRequested () )
+
+        PPTXImported jsonString ->
+            case Decode.decodeString AppJson.decodePresentation jsonString of
+                Ok presentation ->
+                    let
+                        newModel =
+                            { model
+                                | presentation = presentation
+                                , currentSlideIndex = 0
+                                , editingContent =
+                                    List.head presentation.slides
+                                        |> Maybe.map .content
+                                        |> Maybe.withDefault ""
+                            }
+                    in
+                    ( newModel, savePresentation presentation )
+
+                Err _ ->
+                    -- If decode fails, it might be an error message
+                    ( model, Cmd.none )
+
 
 savePresentation : Presentation -> Cmd Msg
 savePresentation presentation =
@@ -582,6 +605,7 @@ subscriptions _ =
         [ Browser.Events.onKeyDown keyDecoder
         , Ports.imagePasted ImagePasted
         , Ports.localStorageLoaded LocalStorageLoaded
+        , Ports.pptxImported PPTXImported
         ]
 
 
