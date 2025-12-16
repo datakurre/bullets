@@ -680,9 +680,9 @@
                     pptxSlide.background = { color: 'F5F5F0' };
                     
                     // Convert slide based on layout
-                    if (slide.layout === 'JustMarkdown') {
+                    if (slide.layout === 'just-markdown') {
                         convertMarkdownSlide(pptxSlide, slide);
-                    } else if (slide.layout === 'MarkdownWithImage') {
+                    } else if (slide.layout === 'markdown-with-image') {
                         convertMarkdownWithImageSlide(pptxSlide, slide);
                     }
                 });
