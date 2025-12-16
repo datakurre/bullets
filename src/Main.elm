@@ -281,6 +281,20 @@ update msg model =
             , savePresentation updatedPresentation
             )
 
+        UpdateTitle title ->
+            let
+                presentation =
+                    model.presentation
+
+                updatedPresentation =
+                    { presentation | title = title }
+            in
+            ( { model
+                | presentation = updatedPresentation
+              }
+            , savePresentation updatedPresentation
+            )
+
         ImagePasted dataUri ->
             let
                 presentation =

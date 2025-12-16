@@ -58,6 +58,7 @@ type Msg
     | MoveSlideUp Int
     | MoveSlideDown Int
     | UpdateContent String
+    | UpdateTitle String
     | ImagePasted String
     | RemoveImage
     | ImageUploadRequested

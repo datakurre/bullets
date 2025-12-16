@@ -83,6 +83,30 @@
             font-weight: 600;
         }
 
+        .title-input {
+            flex: 1;
+            font-size: 1.1rem;
+            font-weight: 600;
+            padding: 0.25rem 0.5rem;
+            border: 1px solid transparent;
+            border-radius: 4px;
+            background-color: transparent;
+            color: #1a1a1a;
+            transition: all 0.2s;
+        }
+
+        .title-input:hover {
+            background-color: #dcdcd0;
+            border-color: #d0d0c8;
+        }
+
+        .title-input:focus {
+            outline: 3px solid #2a7;
+            outline-offset: 2px;
+            background-color: #fff;
+            border-color: #2a7;
+        }
+
         .btn-add {
             width: 32px;
             height: 32px;
@@ -893,9 +917,12 @@
                 // Extract slides
                 const slides = await extractSlides(zip);
                 
+                // Get filename without extension as fallback title
+                const filenameWithoutExt = file.name.replace(/\.pptx$/i, '');
+                
                 // Convert to bullets format
                 const presentation = {
-                    title: metadata.title || 'Imported Presentation',
+                    title: metadata.title || filenameWithoutExt || 'Imported Presentation',
                     author: metadata.author || '',
                     created: metadata.created || new Date().toISOString(),
                     slides: slides

@@ -198,6 +198,28 @@ suite =
 
                         Err err ->
                             Expect.fail (Decode.errorToString err)
+            , test "Presentation title with various special characters" <|
+                \_ ->
+                    let
+                        presentation =
+                            { slides = []
+                            , title = "My Presentation: Tests & Examples (2025)"
+                            , author = ""
+                            , created = ""
+                            }
+
+                        encoded =
+                            encodePresentation presentation
+
+                        decoded =
+                            Decode.decodeValue decodePresentation encoded
+                    in
+                    case decoded of
+                        Ok result ->
+                            Expect.equal result.title presentation.title
+
+                        Err err ->
+                            Expect.fail (Decode.errorToString err)
             ]
         , describe "Legacy format compatibility"
             [ test "Can decode old format with layout field" <|

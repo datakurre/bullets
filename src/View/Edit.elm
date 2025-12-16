@@ -1,7 +1,7 @@
 module View.Edit exposing (viewEditMode)
 
-import Html exposing (Html, aside, button, div, h3, img, main_, nav, span, text, textarea)
-import Html.Attributes exposing (attribute, class, draggable, placeholder, src, value)
+import Html exposing (Html, aside, button, div, h3, img, input, main_, nav, span, text, textarea)
+import Html.Attributes exposing (attribute, class, draggable, placeholder, src, type_, value)
 import Html.Events exposing (on, onBlur, onClick, onFocus, onInput, preventDefaultOn)
 import Json.Decode as Decode
 import MarkdownView exposing (renderMarkdown)
@@ -20,7 +20,15 @@ viewSidebar : Model -> Html Msg
 viewSidebar model =
     aside [ class "sidebar", attribute "role" "complementary", attribute "aria-label" "Slide navigation" ]
         [ div [ class "sidebar-header" ]
-            [ h3 [] [ text "Slides" ]
+            [ input
+                [ type_ "text"
+                , value model.presentation.title
+                , onInput UpdateTitle
+                , class "title-input"
+                , placeholder "Presentation Title"
+                , attribute "aria-label" "Presentation title"
+                ]
+                []
             , button [ onClick AddSlide, class "btn-add", attribute "aria-label" "Add new slide" ] [ text "+" ]
             ]
         , nav [ attribute "aria-label" "Slide list" ]
