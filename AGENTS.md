@@ -24,19 +24,23 @@
 - Keyboard shortcuts disabled while editing in textarea
 - Image thumbnails in slide navigation toolbar
 - GitHub Pages deployment workflow with test coverage
-- Comprehensive unit test suite (80 tests)
+- Comprehensive unit test suite (146 tests)
 - elm-review integration for code quality
 - **Comprehensive accessibility support (WCAG 2.1 AA)**: ARIA labels, keyboard navigation, focus management, screen reader announcements, help dialog
 - **Internationalization (i18n)**: Multi-language support with English and Finnish translations, language selector UI, local storage persistence
 
 Recent commits:
-- b3f0c21: Move add-slide button to slide actions
-- 7ceb5e0: Fix UI vertical growth by adding min-height constraints
-- 7024246: Implement i18n with English and Finnish support
-- ab85857: Fix slide navigation scrolling
-- 59052b4: Make presentation title editable
-- 54500ee: Fix action buttons visibility
-- 37bf36d: Fix vertical layout issues
+- 38a25ed: Migrate Main.elm to use Update.elm coordinator (85% size reduction)
+- 410beda: Create Update.elm coordinator module
+- 8ea82f6: Create Update.Keyboard module
+- debf815: Create Update.UI module with TDD tests
+- 1b5fe64: Create Update.FileIO module with TDD tests
+- 12b571d: Create Update.Slide module with comprehensive TDD tests
+- 9d8ec30: Create Update.Image module with TDD tests
+- 876ce9f: Create Update.Content module with TDD tests
+- 2b6a776: Create Update.Storage module with TDD tests
+- 73ea52c: Create Update.Mode module with TDD tests
+- 1d93711: Create Update.Navigation module with TDD tests
 
 ## Current Features
 
@@ -233,6 +237,41 @@ The project uses a Makefile with these targets:
   - View.Present module handles presentation UI
   - Rendered markdown with layout-specific display
 - Shared: MarkdownView module provides markdown rendering helper
+
+### Update Architecture (Modular)
+
+**Update.elm**: Main coordinator module that routes all messages to specialized sub-modules.
+
+**Modular Update Modules** (single responsibility principle):
+- **Update.Navigation**: Slide navigation (NextSlide, PrevSlide, GoToSlide)
+- **Update.Mode**: Mode switching (EnterPresentMode, ExitPresentMode)
+- **Update.Content**: Content editing (UpdateContent, UpdateTitle)
+- **Update.Storage**: Local storage operations (LocalStorageLoaded)
+- **Update.Image**: Image handling (paste, upload, load, remove)
+- **Update.Slide**: Slide manipulation (add, delete, duplicate, move, drag-drop)
+- **Update.FileIO**: PowerPoint import/export (ExportToPPTX, ImportPPTXRequested, PPTXImported)
+- **Update.UI**: UI state (help dialog, language, textarea focus)
+- **Update.Keyboard**: Keyboard event routing (KeyPressed, delegates to other modules)
+
+**Benefits**:
+- **Maintainability**: Each module has single, clear responsibility
+- **Testability**: 146 unit tests covering all update logic
+- **Readability**: Easy to locate specific functionality
+- **Scalability**: Adding new features doesn't bloat Main.elm
+- **Reduced Main.elm**: From 810 lines to 124 lines (85% reduction)
+
+**Architecture Pattern**:
+```elm
+-- Main.elm delegates to Update.elm
+update = Update.update
+
+-- Update.elm routes to specialized modules
+update msg model =
+    case msg of
+        NextSlide -> Update.Navigation.nextSlide model
+        AddSlide -> Update.Slide.addSlide model
+        -- ... etc
+```
 
 ### Internationalization (i18n)
 
