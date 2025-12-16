@@ -412,6 +412,22 @@ update msg model =
                     else
                         ( model, Cmd.none )
 
+                "i" ->
+                    -- Ctrl+I for image upload in edit mode
+                    if model.mode == Edit && ctrlKey && not model.isTextareaFocused then
+                        update ImageUploadRequested model
+
+                    else
+                        ( model, Cmd.none )
+
+                "o" ->
+                    -- Ctrl+O for PPTX import in edit mode
+                    if model.mode == Edit && ctrlKey && not model.isTextareaFocused then
+                        update ImportPPTXRequested model
+
+                    else
+                        ( model, Cmd.none )
+
                 _ ->
                     -- Don't handle other keys if help dialog is shown
                     if model.showHelpDialog then
@@ -707,6 +723,11 @@ viewHelpDialog =
                     [ h3 [] [ text "Slide Management" ]
                     , viewShortcut "Ctrl+Shift+↑" "Move current slide up"
                     , viewShortcut "Ctrl+Shift+↓" "Move current slide down"
+                    ]
+                , div [ class "help-section" ]
+                    [ h3 [] [ text "File Operations" ]
+                    , viewShortcut "Ctrl+I" "Upload image"
+                    , viewShortcut "Ctrl+O" "Import PPTX file"
                     ]
                 , div [ class "help-section" ]
                     [ h3 [] [ text "Presentation Mode" ]
