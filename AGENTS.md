@@ -16,23 +16,22 @@
 - Presentation mode with keyboard navigation
 - Image paste support via clipboard AND file upload
 - JSON import/export
+- PowerPoint PPTX export functionality
 - Local storage autosave/autoload
 - Complete CSS styling with clean left-aligned design
 - Markdown rendering in both preview and presentation modes
 - VIM-style keybindings (j/k/arrow navigation, g/G, p for present)
-- GitHub Pages deployment workflow
+- Keyboard shortcuts disabled while editing in textarea
+- GitHub Pages deployment workflow with test coverage
 - Comprehensive unit test suite (72 tests)
 - elm-review integration for code quality
 
 Recent commits:
+- 4807bd5: Add test coverage to GitHub Actions workflow
+- e0f8b5e: Fix PPTX export empty slides by matching layout string format
+- 3c00643: Add PowerPoint PPTX export functionality
+- ad66a2b: Disable keyboard shortcuts while editing in textarea
 - c22fa1b: Add arrow key navigation in edit mode for slide selection
-- 8c98260: Cleanup presentation view: remove dark background and align slides consistently
-- 56a7f54: Fix elm-review issues and add manual testing documentation
-- 0855b1e: Add drag and drop slide arrangement functionality
-- ec3c201: Remove all text centering from markdown content and titles
-
-🚧 **IN PROGRESS**:
-- PowerPoint PPTX export (detailed plan in TODO-PPTX.md)
 
 ## Current Features
 
@@ -47,6 +46,8 @@ Recent commits:
 - Import from JSON file
 - VIM-style navigation: j/k for next/prev slide, g/G for first/last, p for present
 - Arrow key navigation: Up/Down arrows for next/prev slide
+- Keyboard shortcuts disabled while typing in textarea
+- Export to PowerPoint PPTX format
 
 ### Presentation Mode
 - Clean light-themed display (beige background)
@@ -65,7 +66,10 @@ A minimal, elegant presentation tool that:
 - Supports multiple slide layouts (markdown, markdown with image)
 - Handles images via copy-paste (stored as data URIs)
 - Allows import/export of presentations as JSON
+- Exports presentations to PowerPoint PPTX format
 - Features a clean left-aligned design with consistent styling
+
+✅ **All vision items are now implemented!**
 
 ## Development Environment
 
