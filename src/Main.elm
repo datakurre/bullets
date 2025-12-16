@@ -213,6 +213,7 @@ update msg model =
                 ( { model
                     | presentation = updatedPresentation
                     , currentSlideIndex = newIndex
+                    , announcement = "Slide moved up"
                   }
                 , savePresentation updatedPresentation
                 )
@@ -249,6 +250,7 @@ update msg model =
                 ( { model
                     | presentation = updatedPresentation
                     , currentSlideIndex = newIndex
+                    , announcement = "Slide moved down"
                   }
                 , savePresentation updatedPresentation
                 )
@@ -348,7 +350,7 @@ update msg model =
             in
             ( { model | presentation = updatedPresentation }, savePresentation updatedPresentation )
 
-        KeyPressed key ->
+        KeyPressed key ctrlKey shiftKey ->
             case key of
                 -- Help dialog toggle (works in both modes, but only when help is not shown)
                 "?" ->
@@ -366,6 +368,49 @@ update msg model =
 
                             Edit ->
                                 ( model, Cmd.none )
+
+                "ArrowUp" ->
+                    -- Ctrl+Shift+Up moves current slide up in edit mode
+                    if model.mode == Edit && ctrlKey && shiftKey && not model.isTextareaFocused then
+                        let
+                            updatedModel =
+                                Tuple.first (update (MoveSlideUp model.currentSlideIndex) model)
+                        in
+                        ( { updatedModel | announcement = "Slide moved up" }, Cmd.none )
+
+                    else if model.mode == Edit && not model.isTextareaFocused then
+                        -- Regular arrow up navigation
+                        let
+                            newIndex =
+                                max 0 (model.currentSlideIndex - 1)
+                        in
+                        update (GoToSlide newIndex) model
+
+                    else
+                        ( model, Cmd.none )
+
+                "ArrowDown" ->
+                    -- Ctrl+Shift+Down moves current slide down in edit mode
+                    if model.mode == Edit && ctrlKey && shiftKey && not model.isTextareaFocused then
+                        let
+                            updatedModel =
+                                Tuple.first (update (MoveSlideDown model.currentSlideIndex) model)
+                        in
+                        ( { updatedModel | announcement = "Slide moved down" }, Cmd.none )
+
+                    else if model.mode == Edit && not model.isTextareaFocused then
+                        -- Regular arrow down navigation
+                        let
+                            maxIndex =
+                                List.length model.presentation.slides - 1
+
+                            newIndex =
+                                min maxIndex (model.currentSlideIndex + 1)
+                        in
+                        update (GoToSlide newIndex) model
+
+                    else
+                        ( model, Cmd.none )
 
                 _ ->
                     -- Don't handle other keys if help dialog is shown
@@ -433,23 +478,6 @@ update msg model =
                                             update (GoToSlide newIndex) model
 
                                         "k" ->
-                                            let
-                                                newIndex =
-                                                    max 0 (model.currentSlideIndex - 1)
-                                            in
-                                            update (GoToSlide newIndex) model
-
-                                        "ArrowDown" ->
-                                            let
-                                                maxIndex =
-                                                    List.length model.presentation.slides - 1
-
-                                                newIndex =
-                                                    min maxIndex (model.currentSlideIndex + 1)
-                                            in
-                                            update (GoToSlide newIndex) model
-
-                                        "ArrowUp" ->
                                             let
                                                 newIndex =
                                                     max 0 (model.currentSlideIndex - 1)
@@ -615,7 +643,10 @@ subscriptions _ =
 
 keyDecoder : Decode.Decoder Msg
 keyDecoder =
-    Decode.map KeyPressed (Decode.field "key" Decode.string)
+    Decode.map3 KeyPressed
+        (Decode.field "key" Decode.string)
+        (Decode.field "ctrlKey" Decode.bool)
+        (Decode.field "shiftKey" Decode.bool)
 
 
 
@@ -665,6 +696,11 @@ viewHelpDialog =
                     , viewShortcut "↓ / j" "Next slide"
                     , viewShortcut "g" "First slide"
                     , viewShortcut "G" "Last slide"
+                    ]
+                , div [ class "help-section" ]
+                    [ h3 [] [ text "Slide Management" ]
+                    , viewShortcut "Ctrl+Shift+↑" "Move current slide up"
+                    , viewShortcut "Ctrl+Shift+↓" "Move current slide down"
                     ]
                 , div [ class "help-section" ]
                     [ h3 [] [ text "Presentation Mode" ]

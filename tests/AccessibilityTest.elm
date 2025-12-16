@@ -69,6 +69,30 @@ suite =
                     updatedModel.announcement
                         |> Expect.equal "Exiting presentation mode"
             ]
+        , describe "Keyboard Slide Reordering"
+            [ test "MoveSlideUp should announce slide moved" <|
+                \_ ->
+                    let
+                        model =
+                            { initialModel | announcement = "", currentSlideIndex = 1 }
+
+                        updatedModel =
+                            updateWithAnnouncement (MoveSlideUp 1) model
+                    in
+                    updatedModel.announcement
+                        |> Expect.equal "Slide moved up"
+            , test "MoveSlideDown should announce slide moved" <|
+                \_ ->
+                    let
+                        model =
+                            { initialModel | announcement = "", currentSlideIndex = 0 }
+
+                        updatedModel =
+                            updateWithAnnouncement (MoveSlideDown 0) model
+                    in
+                    updatedModel.announcement
+                        |> Expect.equal "Slide moved down"
+            ]
         ]
 
 
@@ -91,6 +115,12 @@ updateWithAnnouncement msg model =
 
         ExitPresentMode ->
             { model | announcement = "Exiting presentation mode" }
+
+        MoveSlideUp _ ->
+            { model | announcement = "Slide moved up" }
+
+        MoveSlideDown _ ->
+            { model | announcement = "Slide moved down" }
 
         _ ->
             model

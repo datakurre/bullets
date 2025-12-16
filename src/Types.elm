@@ -63,7 +63,8 @@ type Msg
     | ImageUploadRequested
     | ImageFileSelected File
     | ImageFileLoaded String
-    | KeyPressed String
+    | KeyPressed String Bool Bool
+      -- KeyPressed key ctrlKey shiftKey
     | LocalStorageLoaded String
     | DragStart Int
     | DragOver Int
