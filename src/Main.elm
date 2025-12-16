@@ -146,6 +146,33 @@ update msg model =
             , savePresentation updatedPresentation
             )
 
+        AddSlideAfter index ->
+            let
+                presentation =
+                    model.presentation
+
+                updatedSlides =
+                    SlideManipulation.addSlideAfter index presentation.slides
+
+                updatedPresentation =
+                    { presentation | slides = updatedSlides }
+
+                newIndex =
+                    index + 1
+
+                newSlide =
+                    List.drop newIndex updatedSlides
+                        |> List.head
+            in
+            ( { model
+                | presentation = updatedPresentation
+                , currentSlideIndex = newIndex
+                , editingContent = Maybe.map .content newSlide |> Maybe.withDefault "# New Slide"
+                , announcement = t.slideAdded
+              }
+            , savePresentation updatedPresentation
+            )
+
         DeleteSlide index ->
             let
                 presentation =

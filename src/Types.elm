@@ -55,6 +55,7 @@ type Msg
     | EnterPresentMode
     | ExitPresentMode
     | AddSlide
+    | AddSlideAfter Int
     | DeleteSlide Int
     | DuplicateSlide Int
     | MoveSlideUp Int

@@ -1,5 +1,6 @@
 module SlideManipulation exposing
     ( addSlide
+    , addSlideAfter
     , deleteSlide
     , duplicateSlide
     , moveSlide
@@ -22,6 +23,27 @@ addSlide slides =
             }
     in
     slides ++ [ newSlide ]
+
+
+{-| Add a new slide after the given index.
+Returns the list with new slide inserted after the index.
+If index is out of bounds, adds to the end.
+-}
+addSlideAfter : Int -> List Slide -> List Slide
+addSlideAfter index slides =
+    let
+        newSlide =
+            { content = "# New Slide"
+            , image = Nothing
+            }
+
+        before =
+            List.take (index + 1) slides
+
+        after =
+            List.drop (index + 1) slides
+    in
+    before ++ [ newSlide ] ++ after
 
 
 {-| Delete a slide at the given index. Returns the original list if:

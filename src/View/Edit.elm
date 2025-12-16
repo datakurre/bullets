@@ -34,7 +34,6 @@ viewSidebar model =
                 , attribute "aria-label" t.presentationTitle
                 ]
                 []
-            , button [ onClick AddSlide, class "btn-add", attribute "aria-label" t.addNewSlide ] [ text t.addSlide ]
             ]
         , nav [ attribute "aria-label" t.slideList ]
             [ div [ class "slide-list", attribute "role" "list" ]
@@ -171,6 +170,7 @@ viewSlideItem model index slide =
             , div [ class "slide-item-actions", attribute "role" "toolbar", attribute "aria-label" t.slideActions ]
                 [ button [ onClick (MoveSlideUp index), class "btn-icon", attribute "aria-label" t.moveSlideUp ] [ text "↑" ]
                 , button [ onClick (MoveSlideDown index), class "btn-icon", attribute "aria-label" t.moveSlideDown ] [ text "↓" ]
+                , button [ onClick (AddSlideAfter index), class "btn-icon", attribute "aria-label" t.addNewSlide ] [ text "+" ]
                 , button [ onClick (DuplicateSlide index), class "btn-icon", attribute "aria-label" t.duplicateSlide ] [ text "⎘" ]
                 , button [ onClick (DeleteSlide index), class "btn-icon btn-danger", attribute "aria-label" t.deleteSlide ] [ text "×" ]
                 ]
