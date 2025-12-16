@@ -552,6 +552,13 @@ update msg model =
         TextareaBlurred ->
             ( { model | isTextareaFocused = False }, Cmd.none )
 
+        ExportToPPTX ->
+            let
+                json =
+                    AppJson.encodePresentation model.presentation
+            in
+            ( model, Ports.exportToPPTX json )
+
 
 savePresentation : Presentation -> Cmd Msg
 savePresentation presentation =

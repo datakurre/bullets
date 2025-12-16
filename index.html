@@ -612,6 +612,7 @@
 </head>
 <body>
     <div id="app"></div>
+    <script src="https://cdn.jsdelivr.net/npm/pptxgenjs@3.12.0/dist/pptxgen.bundle.js"></script>
     <script src="elm.js"></script>
     <script>
         var app = Elm.Main.init({
@@ -657,6 +658,256 @@
                 app.ports.localStorageLoaded.send('');
             }
         });
+
+        // PowerPoint PPTX export support
+        app.ports.exportToPPTX.subscribe(function(presentation) {
+            try {
+                const pptx = new PptxGenJS();
+                
+                // Set presentation properties
+                pptx.author = presentation.author || 'Bullets';
+                pptx.title = presentation.title;
+                pptx.subject = 'Presentation created with Bullets';
+                
+                // Set default slide layout (16:9)
+                pptx.layout = 'LAYOUT_16x9';
+                
+                // Process each slide
+                presentation.slides.forEach(function(slide, index) {
+                    const pptxSlide = pptx.addSlide();
+                    
+                    // Set slide background
+                    pptxSlide.background = { color: 'F5F5F0' };
+                    
+                    // Convert slide based on layout
+                    if (slide.layout === 'JustMarkdown') {
+                        convertMarkdownSlide(pptxSlide, slide);
+                    } else if (slide.layout === 'MarkdownWithImage') {
+                        convertMarkdownWithImageSlide(pptxSlide, slide);
+                    }
+                });
+                
+                // Generate and download PPTX file
+                const fileName = (presentation.title || 'presentation') + '.pptx';
+                pptx.writeFile({ fileName: fileName });
+                
+                console.log('PPTX export successful:', fileName);
+            } catch (error) {
+                console.error('PPTX export failed:', error);
+                alert('Failed to export PowerPoint: ' + error.message);
+            }
+        });
+        
+        // Convert markdown slide to PPTX
+        function convertMarkdownSlide(pptxSlide, slide) {
+            const lines = slide.content.split('\n');
+            let yPos = 0.5; // Start position in inches
+            let isFirstHeading = true;
+            
+            lines.forEach(function(line, index) {
+                line = line.trim();
+                if (!line) return;
+                
+                // Handle headings
+                if (line.startsWith('# ')) {
+                    const text = line.substring(2);
+                    pptxSlide.addText(text, {
+                        x: 0.5,
+                        y: yPos,
+                        w: 9,
+                        h: 1,
+                        fontSize: isFirstHeading ? 44 : 36,
+                        bold: true,
+                        color: '1A1A1A',
+                        align: 'left',
+                        valign: 'top'
+                    });
+                    yPos += isFirstHeading ? 1.2 : 1.0;
+                    isFirstHeading = false;
+                } else if (line.startsWith('## ')) {
+                    const text = line.substring(3);
+                    pptxSlide.addText(text, {
+                        x: 0.5,
+                        y: yPos,
+                        w: 9,
+                        h: 0.8,
+                        fontSize: 32,
+                        bold: true,
+                        color: '1A1A1A',
+                        align: 'left',
+                        valign: 'top'
+                    });
+                    yPos += 0.9;
+                } else if (line.startsWith('### ')) {
+                    const text = line.substring(4);
+                    pptxSlide.addText(text, {
+                        x: 0.5,
+                        y: yPos,
+                        w: 9,
+                        h: 0.6,
+                        fontSize: 28,
+                        bold: true,
+                        color: '1A1A1A',
+                        align: 'left',
+                        valign: 'top'
+                    });
+                    yPos += 0.7;
+                } else if (line.startsWith('- ') || line.startsWith('* ')) {
+                    // Bullet point - use en-dash
+                    const text = '– ' + line.substring(2);
+                    pptxSlide.addText(text, {
+                        x: 0.8,
+                        y: yPos,
+                        w: 8.7,
+                        h: 0.4,
+                        fontSize: 20,
+                        color: '1A1A1A',
+                        align: 'left',
+                        valign: 'top'
+                    });
+                    yPos += 0.5;
+                } else if (line.match(/^\d+\. /)) {
+                    // Numbered list
+                    pptxSlide.addText(line, {
+                        x: 0.8,
+                        y: yPos,
+                        w: 8.7,
+                        h: 0.4,
+                        fontSize: 20,
+                        color: '1A1A1A',
+                        align: 'left',
+                        valign: 'top'
+                    });
+                    yPos += 0.5;
+                } else {
+                    // Regular paragraph
+                    pptxSlide.addText(line, {
+                        x: 0.5,
+                        y: yPos,
+                        w: 9,
+                        h: 0.4,
+                        fontSize: 20,
+                        color: '1A1A1A',
+                        align: 'left',
+                        valign: 'top'
+                    });
+                    yPos += 0.5;
+                }
+            });
+        }
+        
+        // Convert markdown with image slide to PPTX
+        function convertMarkdownWithImageSlide(pptxSlide, slide) {
+            const lines = slide.content.split('\n');
+            let yPos = 0.5; // Start position in inches
+            
+            // If there's an image, split the slide in half
+            if (slide.image) {
+                // Left side: markdown content
+                lines.forEach(function(line) {
+                    line = line.trim();
+                    if (!line) return;
+                    
+                    // Handle headings
+                    if (line.startsWith('# ')) {
+                        const text = line.substring(2);
+                        pptxSlide.addText(text, {
+                            x: 0.3,
+                            y: yPos,
+                            w: 4.5,
+                            h: 0.8,
+                            fontSize: 32,
+                            bold: true,
+                            color: '1A1A1A',
+                            align: 'left',
+                            valign: 'top'
+                        });
+                        yPos += 0.9;
+                    } else if (line.startsWith('## ')) {
+                        const text = line.substring(3);
+                        pptxSlide.addText(text, {
+                            x: 0.3,
+                            y: yPos,
+                            w: 4.5,
+                            h: 0.6,
+                            fontSize: 28,
+                            bold: true,
+                            color: '1A1A1A',
+                            align: 'left',
+                            valign: 'top'
+                        });
+                        yPos += 0.7;
+                    } else if (line.startsWith('### ')) {
+                        const text = line.substring(4);
+                        pptxSlide.addText(text, {
+                            x: 0.3,
+                            y: yPos,
+                            w: 4.5,
+                            h: 0.5,
+                            fontSize: 24,
+                            bold: true,
+                            color: '1A1A1A',
+                            align: 'left',
+                            valign: 'top'
+                        });
+                        yPos += 0.6;
+                    } else if (line.startsWith('- ') || line.startsWith('* ')) {
+                        // Bullet point - use en-dash
+                        const text = '– ' + line.substring(2);
+                        pptxSlide.addText(text, {
+                            x: 0.5,
+                            y: yPos,
+                            w: 4.3,
+                            h: 0.35,
+                            fontSize: 18,
+                            color: '1A1A1A',
+                            align: 'left',
+                            valign: 'top'
+                        });
+                        yPos += 0.45;
+                    } else if (line.match(/^\d+\. /)) {
+                        // Numbered list
+                        pptxSlide.addText(line, {
+                            x: 0.5,
+                            y: yPos,
+                            w: 4.3,
+                            h: 0.35,
+                            fontSize: 18,
+                            color: '1A1A1A',
+                            align: 'left',
+                            valign: 'top'
+                        });
+                        yPos += 0.45;
+                    } else {
+                        // Regular paragraph
+                        pptxSlide.addText(line, {
+                            x: 0.3,
+                            y: yPos,
+                            w: 4.5,
+                            h: 0.35,
+                            fontSize: 18,
+                            color: '1A1A1A',
+                            align: 'left',
+                            valign: 'top'
+                        });
+                        yPos += 0.45;
+                    }
+                });
+                
+                // Right side: image
+                pptxSlide.addImage({
+                    data: slide.image,
+                    x: 5.2,
+                    y: 0.5,
+                    w: 4.5,
+                    h: 5,
+                    sizing: { type: 'contain', w: 4.5, h: 5 }
+                });
+            } else {
+                // No image, just use full width markdown
+                convertMarkdownSlide(pptxSlide, slide);
+            }
+        }
     </script>
 </body>
 </html>

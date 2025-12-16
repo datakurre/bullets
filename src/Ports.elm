@@ -1,4 +1,7 @@
-port module Ports exposing (imagePasted, loadFromLocalStorage, localStorageLoaded, saveToLocalStorage, setupImagePaste)
+port module Ports exposing (exportToPPTX, imagePasted, loadFromLocalStorage, localStorageLoaded, saveToLocalStorage, setupImagePaste)
+
+import Json.Encode as Encode
+
 
 -- Outgoing port to tell JavaScript to setup image paste listener
 
@@ -32,3 +35,10 @@ port loadFromLocalStorage : () -> Cmd msg
 
 
 port localStorageLoaded : (String -> msg) -> Sub msg
+
+
+
+-- Outgoing port to export presentation to PowerPoint PPTX format
+
+
+port exportToPPTX : Encode.Value -> Cmd msg

@@ -80,6 +80,7 @@ type Msg
     | Drop Int
     | TextareaFocused
     | TextareaBlurred
+    | ExportToPPTX
 
 
 
