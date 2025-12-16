@@ -11,11 +11,11 @@ import Json as AppJson
 import Json.Decode as Decode
 import Json.Encode as Encode
 import Ports
+import SlideManipulation
 import Task
 import Types exposing (Mode(..), Model, Msg(..), Presentation, Slide, SlideLayout(..), initialModel)
 import View.Edit exposing (viewEditMode)
 import View.Present exposing (viewPresentMode)
-
 
 
 -- MAIN
@@ -80,25 +80,26 @@ update msg model =
 
         AddSlide ->
             let
-                newSlide =
-                    { content = "# New Slide"
-                    , layout = JustMarkdown
-                    , image = Nothing
-                    }
-
                 presentation =
                     model.presentation
 
+                updatedSlides =
+                    SlideManipulation.addSlide presentation.slides
+
                 updatedPresentation =
-                    { presentation | slides = presentation.slides ++ [ newSlide ] }
+                    { presentation | slides = updatedSlides }
 
                 newIndex =
-                    List.length updatedPresentation.slides - 1
+                    List.length updatedSlides - 1
+                    
+                newSlide =
+                    List.drop newIndex updatedSlides
+                        |> List.head
             in
             ( { model
                 | presentation = updatedPresentation
                 , currentSlideIndex = newIndex
-                , editingContent = newSlide.content
+                , editingContent = Maybe.map .content newSlide |> Maybe.withDefault "# New Slide"
               }
             , savePresentation updatedPresentation
             )
@@ -109,9 +110,7 @@ update msg model =
                     model.presentation
 
                 updatedSlides =
-                    List.indexedMap Tuple.pair presentation.slides
-                        |> List.filter (\( i, _ ) -> i /= index)
-                        |> List.map Tuple.second
+                    SlideManipulation.deleteSlide index presentation.slides
 
                 updatedPresentation =
                     { presentation | slides = updatedSlides }
@@ -136,24 +135,8 @@ update msg model =
                 presentation =
                     model.presentation
 
-                maybeSlide =
-                    List.drop index presentation.slides
-                        |> List.head
-
                 updatedSlides =
-                    case maybeSlide of
-                        Just slide ->
-                            let
-                                before =
-                                    List.take (index + 1) presentation.slides
-
-                                after =
-                                    List.drop (index + 1) presentation.slides
-                            in
-                            before ++ [ slide ] ++ after
-
-                        Nothing ->
-                            presentation.slides
+                    SlideManipulation.duplicateSlide index presentation.slides
 
                 updatedPresentation =
                     { presentation | slides = updatedSlides }
@@ -170,7 +153,7 @@ update msg model =
                         model.presentation
 
                     updatedSlides =
-                        swapSlides (index - 1) index presentation.slides
+                        SlideManipulation.moveSlideUp index presentation.slides
 
                     updatedPresentation =
                         { presentation | slides = updatedSlides }
@@ -206,7 +189,7 @@ update msg model =
             else
                 let
                     updatedSlides =
-                        swapSlides index (index + 1) presentation.slides
+                        SlideManipulation.moveSlideDown index presentation.slides
 
                     updatedPresentation =
                         { presentation | slides = updatedSlides }
@@ -499,41 +482,6 @@ savePresentation presentation =
             Encode.encode 0 json
     in
     Ports.saveToLocalStorage jsonString
-
-
-swapSlides : Int -> Int -> List Slide -> List Slide
-swapSlides i j slides =
-    let
-        indexed =
-            List.indexedMap Tuple.pair slides
-
-        maybeA =
-            List.filter (\( idx, _ ) -> idx == i) indexed
-                |> List.head
-                |> Maybe.map Tuple.second
-
-        maybeB =
-            List.filter (\( idx, _ ) -> idx == j) indexed
-                |> List.head
-                |> Maybe.map Tuple.second
-    in
-    case ( maybeA, maybeB ) of
-        ( Just a, Just b ) ->
-            List.indexedMap
-                (\idx slide ->
-                    if idx == i then
-                        b
-
-                    else if idx == j then
-                        a
-
-                    else
-                        slide
-                )
-                slides
-
-        _ ->
-            slides
 
 
 
