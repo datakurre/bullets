@@ -660,6 +660,266 @@
             }
         });
 
+        // PowerPoint PPTX import support
+        app.ports.importPPTXRequested.subscribe(function() {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = '.pptx,application/vnd.openxmlformats-officedocument.presentationml.presentation';
+            
+            input.onchange = function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    parsePPTX(file);
+                }
+            };
+            
+            input.click();
+        });
+
+        async function parsePPTX(file) {
+            try {
+                console.log('Starting PPTX import...');
+                
+                // Read PPTX as zip
+                const arrayBuffer = await file.arrayBuffer();
+                const zip = await JSZip.loadAsync(arrayBuffer);
+                
+                // Extract metadata
+                const metadata = await extractMetadata(zip);
+                
+                // Extract slides
+                const slides = await extractSlides(zip);
+                
+                // Convert to bullets format
+                const presentation = {
+                    title: metadata.title || 'Imported Presentation',
+                    author: metadata.author || '',
+                    created: metadata.created || new Date().toISOString(),
+                    slides: slides
+                };
+                
+                console.log('PPTX import successful:', presentation);
+                
+                // Send to Elm
+                app.ports.pptxImported.send(JSON.stringify(presentation));
+            } catch (error) {
+                console.error('PPTX import failed:', error);
+                alert('Failed to import PowerPoint: ' + error.message);
+            }
+        }
+
+        async function extractMetadata(zip) {
+            try {
+                const coreXmlFile = zip.file('docProps/core.xml');
+                if (!coreXmlFile) {
+                    return { title: '', author: '', created: '' };
+                }
+                
+                const coreXml = await coreXmlFile.async('string');
+                const parser = new DOMParser();
+                const xmlDoc = parser.parseFromString(coreXml, 'text/xml');
+                
+                const title = xmlDoc.getElementsByTagName('dc:title')[0]?.textContent || '';
+                const author = xmlDoc.getElementsByTagName('dc:creator')[0]?.textContent || '';
+                const created = xmlDoc.getElementsByTagName('dcterms:created')[0]?.textContent || '';
+                
+                return { title, author, created };
+            } catch (error) {
+                console.warn('Could not extract metadata:', error);
+                return { title: '', author: '', created: '' };
+            }
+        }
+
+        async function extractSlides(zip) {
+            const slides = [];
+            
+            // Get all slide files
+            const slideFiles = Object.keys(zip.files)
+                .filter(name => name.match(/^ppt\/slides\/slide\d+\.xml$/))
+                .sort((a, b) => {
+                    const numA = parseInt(a.match(/\d+/)[0]);
+                    const numB = parseInt(b.match(/\d+/)[0]);
+                    return numA - numB;
+                });
+            
+            for (const slideFileName of slideFiles) {
+                try {
+                    const slideXml = await zip.file(slideFileName).async('string');
+                    const slideNumber = slideFileName.match(/\d+/)[0];
+                    const relsFileName = `ppt/slides/_rels/slide${slideNumber}.xml.rels`;
+                    
+                    let relsXml = null;
+                    const relsFile = zip.file(relsFileName);
+                    if (relsFile) {
+                        relsXml = await relsFile.async('string');
+                    }
+                    
+                    const slide = await parseSlide(slideXml, relsXml, zip);
+                    slides.push(slide);
+                } catch (error) {
+                    console.error(`Failed to parse ${slideFileName}:`, error);
+                    // Add a placeholder slide
+                    slides.push({
+                        content: '# Error\n\nFailed to import this slide',
+                        layout: 'just-markdown',
+                        image: null
+                    });
+                }
+            }
+            
+            return slides;
+        }
+
+        async function parseSlide(slideXml, relsXml, zip) {
+            const parser = new DOMParser();
+            const xmlDoc = parser.parseFromString(slideXml, 'text/xml');
+            
+            // Extract text content
+            const textElements = xmlDoc.getElementsByTagName('a:t');
+            const texts = [];
+            for (let i = 0; i < textElements.length; i++) {
+                const text = textElements[i].textContent;
+                if (text && text.trim()) {
+                    texts.push(text.trim());
+                }
+            }
+            
+            // Convert to markdown
+            let content = convertTextsToMarkdown(texts, xmlDoc);
+            
+            // Extract images
+            let image = null;
+            if (relsXml) {
+                image = await extractFirstImage(xmlDoc, relsXml, zip);
+            }
+            
+            // Determine layout
+            const layout = image ? 'markdown-with-image' : 'just-markdown';
+            
+            return {
+                content: content || '# Empty Slide',
+                layout: layout,
+                image: image
+            };
+        }
+
+        function convertTextsToMarkdown(texts, xmlDoc) {
+            if (texts.length === 0) {
+                return '';
+            }
+            
+            const markdown = [];
+            let isFirstItem = true;
+            
+            // Try to detect structure from XML
+            const shapes = xmlDoc.getElementsByTagName('p:sp');
+            let shapeIndex = 0;
+            
+            for (let i = 0; i < shapes.length; i++) {
+                const shape = shapes[i];
+                const shapeTexts = [];
+                const textElements = shape.getElementsByTagName('a:t');
+                
+                for (let j = 0; j < textElements.length; j++) {
+                    const text = textElements[j].textContent?.trim();
+                    if (text) {
+                        shapeTexts.push(text);
+                    }
+                }
+                
+                if (shapeTexts.length === 0) continue;
+                
+                // Check if this is a title shape (first non-empty shape is usually title)
+                const nvSpPr = shape.getElementsByTagName('p:nvSpPr')[0];
+                const phType = nvSpPr?.getElementsByTagName('p:ph')[0]?.getAttribute('type');
+                
+                const combinedText = shapeTexts.join(' ');
+                
+                if (isFirstItem || phType === 'title' || phType === 'ctrTitle') {
+                    // First item or title - use heading
+                    markdown.push('# ' + combinedText);
+                    isFirstItem = false;
+                } else if (phType === 'subTitle') {
+                    markdown.push('## ' + combinedText);
+                } else {
+                    // Check if it looks like a list
+                    const paragraphs = shape.getElementsByTagName('a:p');
+                    if (paragraphs.length > 1) {
+                        // Multiple paragraphs - treat as list
+                        for (let k = 0; k < paragraphs.length; k++) {
+                            const para = paragraphs[k];
+                            const paraTexts = [];
+                            const paraTextElements = para.getElementsByTagName('a:t');
+                            for (let m = 0; m < paraTextElements.length; m++) {
+                                const t = paraTextElements[m].textContent?.trim();
+                                if (t) paraTexts.push(t);
+                            }
+                            if (paraTexts.length > 0) {
+                                markdown.push('- ' + paraTexts.join(' '));
+                            }
+                        }
+                    } else {
+                        // Single paragraph
+                        markdown.push('\n' + combinedText);
+                    }
+                }
+            }
+            
+            return markdown.join('\n');
+        }
+
+        async function extractFirstImage(xmlDoc, relsXml, zip) {
+            try {
+                const parser = new DOMParser();
+                const relsDoc = parser.parseFromString(relsXml, 'text/xml');
+                
+                // Find image relationships
+                const relationships = relsDoc.getElementsByTagName('Relationship');
+                let imageRelId = null;
+                let imagePath = null;
+                
+                for (let i = 0; i < relationships.length; i++) {
+                    const rel = relationships[i];
+                    const type = rel.getAttribute('Type');
+                    if (type && type.includes('image')) {
+                        imageRelId = rel.getAttribute('Id');
+                        imagePath = rel.getAttribute('Target');
+                        break;
+                    }
+                }
+                
+                if (!imagePath) {
+                    return null;
+                }
+                
+                // Resolve image path
+                const fullImagePath = 'ppt/slides/' + imagePath;
+                const imageFile = zip.file(fullImagePath);
+                
+                if (!imageFile) {
+                    return null;
+                }
+                
+                // Read image as base64
+                const imageData = await imageFile.async('base64');
+                
+                // Determine mime type from extension
+                let mimeType = 'image/png';
+                if (imagePath.endsWith('.jpg') || imagePath.endsWith('.jpeg')) {
+                    mimeType = 'image/jpeg';
+                } else if (imagePath.endsWith('.gif')) {
+                    mimeType = 'image/gif';
+                } else if (imagePath.endsWith('.bmp')) {
+                    mimeType = 'image/bmp';
+                }
+                
+                return `data:${mimeType};base64,${imageData}`;
+            } catch (error) {
+                console.warn('Could not extract image:', error);
+                return null;
+            }
+        }
+
         // PowerPoint PPTX export support
         app.ports.exportToPPTX.subscribe(function(presentation) {
             try {
