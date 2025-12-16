@@ -402,11 +402,67 @@ update msg model =
                         "Escape" ->
                             update ExitPresentMode model
 
+                        -- VIM keybindings for presentation mode
+                        "j" ->
+                            update NextSlide model
+
+                        "k" ->
+                            update PrevSlide model
+
+                        "h" ->
+                            update PrevSlide model
+
+                        "l" ->
+                            update NextSlide model
+
+                        "g" ->
+                            update (GoToSlide 0) model
+
+                        "G" ->
+                            let
+                                lastIndex =
+                                    List.length model.presentation.slides - 1
+                            in
+                            update (GoToSlide lastIndex) model
+
                         _ ->
                             ( model, Cmd.none )
 
                 Edit ->
-                    ( model, Cmd.none )
+                    -- VIM keybindings for edit mode (when not in textarea)
+                    case key of
+                        "j" ->
+                            let
+                                maxIndex =
+                                    List.length model.presentation.slides - 1
+
+                                newIndex =
+                                    min maxIndex (model.currentSlideIndex + 1)
+                            in
+                            update (GoToSlide newIndex) model
+
+                        "k" ->
+                            let
+                                newIndex =
+                                    max 0 (model.currentSlideIndex - 1)
+                            in
+                            update (GoToSlide newIndex) model
+
+                        "p" ->
+                            update EnterPresentMode model
+
+                        "g" ->
+                            update (GoToSlide 0) model
+
+                        "G" ->
+                            let
+                                lastIndex =
+                                    List.length model.presentation.slides - 1
+                            in
+                            update (GoToSlide lastIndex) model
+
+                        _ ->
+                            ( model, Cmd.none )
 
         LocalStorageLoaded content ->
             if String.isEmpty content then

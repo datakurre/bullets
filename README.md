@@ -40,8 +40,19 @@ nix develop
 
 ## Keyboard Shortcuts
 
+### Edit Mode (VIM-style)
+- **j**: Navigate to next slide
+- **k**: Navigate to previous slide
+- **p**: Enter presentation mode
+- **g**: Go to first slide
+- **G**: Go to last slide
+
 ### Presentation Mode
 - **Arrow Keys / Space / Enter**: Navigate slides
+- **j / l**: Next slide (VIM-style)
+- **k / h**: Previous slide (VIM-style)
+- **g**: Go to first slide
+- **G**: Go to last slide
 - **ESC**: Exit presentation mode
 
 ## GitHub Pages Deployment
