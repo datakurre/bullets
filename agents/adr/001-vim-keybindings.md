@@ -1,6 +1,6 @@
 # ADR 001: VIM-Style Keybindings for Navigation and Editing
 
-**Status:** In Review
+**Status:** Accepted
 **Date:** 2025-12-16  
 **Deciders:** Project maintainers  
 
@@ -135,6 +135,24 @@ case model.mode of
 - Requires help dialog to make keybindings discoverable
 
 ## Future Considerations
+
+### VIM-Capable Editor for Markdown Editing
+
+**Current Implementation:** Standard HTML textarea without VIM text editing capabilities
+
+**Status:** Researched and documented in `agents/vim-editor-research.md`
+
+**Decision:** Keep current textarea for now because:
+1. Slide content is typically brief - full VIM editor is overkill
+2. Navigation VIM keybindings (j/k/g/G/p) already provide significant value
+3. Zero additional bundle size and complexity
+4. Aligns with project's minimalist philosophy
+5. Sufficient for current use cases
+
+**Future Option:** CodeMirror 6 with VIM mode if enhanced editing is needed
+- Modern, lightweight, excellent VIM support via `@replit/codemirror-vim`
+- Would require Elm ports integration
+- See `agents/vim-editor-research.md` for full evaluation and implementation strategy
 
 ### Potential Additions
 
