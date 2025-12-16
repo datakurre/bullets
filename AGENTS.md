@@ -10,44 +10,47 @@
 
 ✅ **COMPLETED** - All core features and vision items have been implemented:
 - Edit mode with slide management (add, delete, duplicate, reorder)
-- Drag and drop slide arrangement
+- Drag and drop slide arrangement with visual placeholder
 - Arrow key navigation in edit mode
-- Three slide layouts (JustMarkdown, MarkdownWithImage)
+- Automatic layout detection (no manual layout selector needed)
 - Presentation mode with keyboard navigation
 - Image paste support via clipboard AND file upload
-- JSON import/export
+- PowerPoint PPTX import functionality
 - PowerPoint PPTX export functionality
 - Local storage autosave/autoload
 - Complete CSS styling with clean left-aligned design
 - Markdown rendering in both preview and presentation modes
 - VIM-style keybindings (j/k/arrow navigation, g/G, p for present)
 - Keyboard shortcuts disabled while editing in textarea
+- Image thumbnails in slide navigation toolbar
 - GitHub Pages deployment workflow with test coverage
 - Comprehensive unit test suite (72 tests)
 - elm-review integration for code quality
 
 Recent commits:
-- 4807bd5: Add test coverage to GitHub Actions workflow
-- e0f8b5e: Fix PPTX export empty slides by matching layout string format
-- 3c00643: Add PowerPoint PPTX export functionality
-- ad66a2b: Disable keyboard shortcuts while editing in textarea
-- c22fa1b: Add arrow key navigation in edit mode for slide selection
+- 03dabf8: Center icons in slide-item buttons
+- bad5c49: Show image thumbnails in slide navigation toolbar
+- a76783c: Add TDD enforcement documentation to AGENTS.md
+- 387a41d: Add visual placeholder for drag and drop - Phase 2
+- d22680b: Add drop target tracking for drag and drop - Phase 1
+- 91e9b32: Remove layout selector and automatically determine layout
+- a020265: Remove Load and Save JSON actions
 
 ## Current Features
 
 ### Edit Mode
-- Sidebar with slide list and thumbnails
+- Sidebar with slide list and image thumbnails
 - Add, delete, duplicate, and reorder slides (via buttons or drag & drop)
-- Two layout options: Markdown, Markdown + Image
+- Automatic layout detection based on content
 - Live markdown preview
 - Image support: paste from clipboard or upload from filesystem
 - Auto-save to browser local storage
-- Export to JSON file
-- Import from JSON file
+- Import from PowerPoint PPTX
+- Export to PowerPoint PPTX
 - VIM-style navigation: j/k for next/prev slide, g/G for first/last, p for present
 - Arrow key navigation: Up/Down arrows for next/prev slide
 - Keyboard shortcuts disabled while typing in textarea
-- Export to PowerPoint PPTX format
+- Visual placeholder during drag and drop operations
 
 ### Presentation Mode
 - Clean light-themed display (beige background)
@@ -63,10 +66,9 @@ Recent commits:
 
 A minimal, elegant presentation tool that:
 - Uses markdown for content authoring
-- Supports multiple slide layouts (markdown, markdown with image)
+- Automatically detects slide layout based on content
 - Handles images via copy-paste (stored as data URIs)
-- Allows import/export of presentations as JSON
-- Exports presentations to PowerPoint PPTX format
+- Allows import/export of presentations as PowerPoint PPTX
 - Features a clean left-aligned design with consistent styling
 
 ✅ **All vision items are now implemented!**
@@ -99,16 +101,13 @@ The project uses a Makefile with these targets:
 
 **Slide**: Individual presentation slide
 - content: String (markdown)
-- layout: SlideLayout
 - image: Maybe String (data URI)
-
-**SlideLayout**: Two variants
-- JustMarkdown: Full-width markdown content
-- MarkdownWithImage: Split view (markdown left, image right)
 
 **Presentation**: Complete presentation
 - slides: List Slide
-- metadata: Title, author, created date
+- title: String
+- author: String
+- created: String
 
 **Model**: Application state
 - mode: Mode (Edit | Present)
@@ -116,16 +115,17 @@ The project uses a Makefile with these targets:
 - presentation: Presentation
 - editingContent: String (buffer for current edits)
 - draggedSlideIndex: Maybe Int (for drag and drop)
+- dropTargetIndex: Maybe Int (for visual placeholder)
 
 ### Message Types
 
 - Navigation: NextSlide, PrevSlide, GoToSlide Int
 - Mode switching: EnterPresentMode, ExitPresentMode
 - Slide management: AddSlide, DeleteSlide Int, DuplicateSlide Int, MoveSlideUp Int, MoveSlideDown Int
-- Drag and drop: DragStart Int, DragOver, DragEnd, Drop Int
-- Content editing: UpdateContent String, ChangeLayout SlideLayout
+- Drag and drop: DragStart Int, DragOver Int, DragEnd, Drop Int
+- Content editing: UpdateContent String
 - Image handling: ImagePasted String, ImageUploadRequested, ImageFileSelected File, ImageFileLoaded String, RemoveImage
-- File operations: DownloadJSON, LoadJSONRequested, FileSelected File, FileLoaded String
+- File operations: ImportPPTXRequested, PPTXFileSelected File, PPTXLoaded String, ExportToPPTX
 - Keyboard: KeyPressed String
 - Storage: LocalStorageLoaded String
 
