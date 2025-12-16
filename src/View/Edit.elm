@@ -1,7 +1,7 @@
 module View.Edit exposing (viewEditMode)
 
-import Html exposing (Html, aside, button, div, h3, img, input, main_, nav, option, select, span, text, textarea)
-import Html.Attributes exposing (attribute, class, draggable, placeholder, selected, src, type_, value)
+import Html exposing (Html, aside, button, div, h3, img, input, label, main_, nav, span, text, textarea)
+import Html.Attributes exposing (attribute, checked, class, draggable, for, id, name, placeholder, src, type_, value)
 import Html.Events exposing (on, onBlur, onClick, onFocus, onInput, preventDefaultOn)
 import I18n
 import Json.Decode as Decode
@@ -63,12 +63,20 @@ viewLanguageSelector model =
         t =
             I18n.translations model.language
 
-        languageOption lang label =
-            option
-                [ value (languageToString lang)
-                , selected (model.language == lang)
+        radioOption lang labelText =
+            label
+                [ class "language-radio-label" ]
+                [ input
+                    [ type_ "radio"
+                    , name "language"
+                    , id (languageToString lang)
+                    , checked (model.language == lang)
+                    , onClick (ChangeLanguage lang)
+                    , class "language-radio"
+                    ]
+                    []
+                , text labelText
                 ]
-                [ text label ]
 
         languageToString lang =
             case lang of
@@ -77,25 +85,15 @@ viewLanguageSelector model =
 
                 I18n.Finnish ->
                     "fi"
-
-        stringToLanguage str =
-            case str of
-                "en" ->
-                    I18n.English
-
-                "fi" ->
-                    I18n.Finnish
-
-                _ ->
-                    I18n.English
     in
-    select
+    div
         [ class "language-selector"
+        , attribute "role" "radiogroup"
         , attribute "aria-label" t.selectLanguage
-        , onInput (\str -> ChangeLanguage (stringToLanguage str))
         ]
-        [ languageOption I18n.English "English"
-        , languageOption I18n.Finnish "Suomi"
+        [ radioOption I18n.Finnish "Suomi"
+        , text " | "
+        , radioOption I18n.English "English"
         ]
 
 

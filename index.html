@@ -233,24 +233,31 @@
         }
 
         .language-selector {
-            width: 100%;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
             padding: 0.5rem;
             border: 1px solid #d0d0c8;
             border-radius: 4px;
             background-color: #f5f5f0;
             color: #1a1a1a;
-            cursor: pointer;
             font-size: 0.9rem;
         }
 
-        .language-selector:hover {
-            background-color: #e8e8e0;
+        .language-radio-label {
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+            cursor: pointer;
         }
 
-        .language-selector:focus {
+        .language-radio {
+            cursor: pointer;
+        }
+
+        .language-radio:focus {
             outline: 3px solid #2a7;
             outline-offset: 2px;
-            border-color: #2a7;
         }
 
         .editor {
