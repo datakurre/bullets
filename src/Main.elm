@@ -10,6 +10,7 @@ import Html.Attributes exposing (class)
 import Json as AppJson
 import Json.Decode as Decode
 import Json.Encode as Encode
+import Ports
 import Task
 import Types exposing (Mode(..), Model, Msg(..), Slide, SlideLayout(..), initialModel)
 import View.Edit exposing (viewEditMode)
@@ -36,7 +37,7 @@ main =
 
 init : () -> ( Model, Cmd Msg )
 init _ =
-    ( initialModel, Cmd.none )
+    ( initialModel, Ports.setupImagePaste () )
 
 
 
@@ -417,12 +418,15 @@ swapSlides i j slides =
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
-    case model.mode of
-        Present ->
-            Browser.Events.onKeyDown keyDecoder
+    Sub.batch
+        [ case model.mode of
+            Present ->
+                Browser.Events.onKeyDown keyDecoder
 
-        Edit ->
-            Sub.none
+            Edit ->
+                Sub.none
+        , Ports.imagePasted ImagePasted
+        ]
 
 
 keyDecoder : Decode.Decoder Msg

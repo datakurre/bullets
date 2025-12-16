@@ -371,6 +371,25 @@
         var app = Elm.Main.init({
             node: document.getElementById('app')
         });
+
+        // Setup image paste listener
+        app.ports.setupImagePaste.subscribe(function() {
+            document.addEventListener('paste', function(e) {
+                var items = e.clipboardData.items;
+                for (var i = 0; i < items.length; i++) {
+                    if (items[i].type.indexOf('image') !== -1) {
+                        var blob = items[i].getAsFile();
+                        var reader = new FileReader();
+                        reader.onload = function(event) {
+                            app.ports.imagePasted.send(event.target.result);
+                        };
+                        reader.readAsDataURL(blob);
+                        e.preventDefault();
+                        break;
+                    }
+                }
+            });
+        });
     </script>
 </body>
 </html>
