@@ -62,6 +62,8 @@ update msg model =
             I18n.translations model.language
     in
     case msg of
+        -- NAVIGATION
+        -- Handle slide navigation in both edit and presentation modes
         NextSlide ->
             let
                 totalSlides =
@@ -104,6 +106,8 @@ update msg model =
             , Cmd.none
             )
 
+        -- MODE SWITCHING
+        -- Toggle between edit and presentation modes
         EnterPresentMode ->
             ( { model
                 | mode = Present
@@ -120,6 +124,8 @@ update msg model =
             , Cmd.none
             )
 
+        -- SLIDE MANAGEMENT
+        -- Add, delete, duplicate, and reorder slides
         AddSlide ->
             let
                 presentation =
@@ -289,6 +295,8 @@ update msg model =
                 , savePresentation updatedPresentation
                 )
 
+        -- CONTENT EDITING
+        -- Update slide content and presentation title
         UpdateContent content ->
             let
                 presentation =
@@ -329,6 +337,8 @@ update msg model =
             , savePresentation updatedPresentation
             )
 
+        -- IMAGE HANDLING
+        -- Paste, upload, load, and remove images from slides
         ImagePasted dataUri ->
             let
                 presentation =
@@ -398,6 +408,9 @@ update msg model =
             in
             ( { model | presentation = updatedPresentation }, savePresentation updatedPresentation )
 
+        -- KEYBOARD HANDLING
+        -- Complex keyboard shortcut handling for both edit and presentation modes
+        -- Includes VIM-style keybindings, modifier keys, and context-aware behavior
         KeyPressed key ctrlKey shiftKey ->
             case key of
                 -- Help dialog toggle (works in both modes, but only when help is not shown)
@@ -564,6 +577,8 @@ update msg model =
                                         _ ->
                                             ( model, Cmd.none )
 
+        -- DRAG AND DROP
+        -- Handle slide reordering via drag and drop
         DragStart index ->
             ( { model | draggedSlideIndex = Just index }, Cmd.none )
 
@@ -616,6 +631,8 @@ update msg model =
                 Nothing ->
                     ( { model | draggedSlideIndex = Nothing, dropTargetIndex = Nothing }, Cmd.none )
 
+        -- STORAGE
+        -- Load presentation from local storage
         LocalStorageLoaded content ->
             if String.isEmpty content then
                 ( model, Cmd.none )
@@ -640,12 +657,16 @@ update msg model =
                     Err _ ->
                         ( model, Cmd.none )
 
+        -- TEXTAREA FOCUS STATE
+        -- Track when user is typing in textarea to disable keyboard shortcuts
         TextareaFocused ->
             ( { model | isTextareaFocused = True }, Cmd.none )
 
         TextareaBlurred ->
             ( { model | isTextareaFocused = False }, Cmd.none )
 
+        -- FILE OPERATIONS
+        -- Export to and import from PowerPoint PPTX format
         ExportToPPTX ->
             let
                 json =
@@ -675,6 +696,8 @@ update msg model =
                 Err _ ->
                     ( model, Cmd.none )
 
+        -- UI STATE
+        -- Toggle help dialog and change language
         ToggleHelpDialog ->
             ( { model | showHelpDialog = not model.showHelpDialog }, Cmd.none )
 
