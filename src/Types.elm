@@ -68,6 +68,7 @@ type Msg
     | LoadJSONRequested
     | FileSelected File
     | FileLoaded String
+    | KeyPressed String
 
 
 

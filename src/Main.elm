@@ -1,6 +1,7 @@
 module Main exposing (main)
 
 import Browser
+import Browser.Events
 import File exposing (File)
 import File.Download as Download
 import File.Select as Select
@@ -349,6 +350,31 @@ update msg model =
                 Err _ ->
                     ( model, Cmd.none )
 
+        KeyPressed key ->
+            case model.mode of
+                Present ->
+                    case key of
+                        "ArrowRight" ->
+                            update NextSlide model
+
+                        " " ->
+                            update NextSlide model
+
+                        "Enter" ->
+                            update NextSlide model
+
+                        "ArrowLeft" ->
+                            update PrevSlide model
+
+                        "Escape" ->
+                            update ExitPresentMode model
+
+                        _ ->
+                            ( model, Cmd.none )
+
+                Edit ->
+                    ( model, Cmd.none )
+
 
 swapSlides : Int -> Int -> List Slide -> List Slide
 swapSlides i j slides =
@@ -391,7 +417,17 @@ swapSlides i j slides =
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
-    Sub.none
+    case model.mode of
+        Present ->
+            Browser.Events.onKeyDown keyDecoder
+
+        Edit ->
+            Sub.none
+
+
+keyDecoder : Decode.Decoder Msg
+keyDecoder =
+    Decode.map KeyPressed (Decode.field "key" Decode.string)
 
 
 
