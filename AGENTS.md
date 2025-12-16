@@ -30,6 +30,7 @@
 - **Internationalization (i18n)**: Multi-language support with English and Finnish translations, language selector UI, local storage persistence
 
 Recent commits:
+<<<<<<< HEAD
 - 38a25ed: Migrate Main.elm to use Update.elm coordinator (85% size reduction)
 - 410beda: Create Update.elm coordinator module
 - 8ea82f6: Create Update.Keyboard module
@@ -41,11 +42,20 @@ Recent commits:
 - 2b6a776: Create Update.Storage module with TDD tests
 - 73ea52c: Create Update.Mode module with TDD tests
 - 1d93711: Create Update.Navigation module with TDD tests
+=======
+- 715297d: Add agents/dependencies.md - Phase 8 of refactor
+- 70150f6: Add agents/workflow.md - Phase 7 of refactor
+- 479ff4b: Add agents/testing.md - Phase 6 of refactor
+- 2e3fbf4: Add agents/build-and-dev.md - Phase 5 of refactor
+- 6df20c7: Increase thumbnail size by 1.5x (60x45 -> 90x68)
+- 03dabf8: Center icons in slide-item buttons
+- bad5c49: Show image thumbnails in slide navigation toolbar
+>>>>>>> 49636f6 (Restructure AGENTS.md as index - Phase 9 of refactor)
 
 ## Current Features
 
 ### Edit Mode
-- Sidebar with slide list and image thumbnails
+- Sidebar with slide list and image thumbnails (90x68px)
 - Add, delete, duplicate, and reorder slides (via buttons or drag & drop)
 - Automatic layout detection based on content
 - Live markdown preview
@@ -79,6 +89,7 @@ A minimal, elegant presentation tool that:
 
 ✅ **All vision items are now implemented!**
 
+<<<<<<< HEAD
 ## Accessibility (A11y)
 
 **ENFORCE ACCESSIBILITY** for all UI features and interactions following WCAG 2.1 AA guidelines:
@@ -171,41 +182,33 @@ For any UI changes:
 - Reference: [ARIA Authoring Practices](https://www.w3.org/WAI/ARIA/apg/)
 
 ## Development Environment
+=======
+## Documentation Index
+>>>>>>> 49636f6 (Restructure AGENTS.md as index - Phase 9 of refactor)
 
-The project uses Nix flakes for reproducible development environment:
-- Elm compiler and core tools
-- elm-format for code formatting
-- elm-test for unit testing  
-- elm-review for code quality
-- elm-live for development server
-- Node.js for tooling support
+Detailed documentation is organized into focused topic areas:
 
-Enter dev environment: `nix develop`
+### Core Documentation
 
-## Build System
+- **[Architecture](./agents/architecture.md)** - Data model, message types, view organization, and overall system design
+- **[Data Model](./agents/data-model.md)** - Type definitions, JSON encoding/decoding, and data structures
+- **[UI Components](./agents/ui-components.md)** - View organization, component hierarchy, and UI patterns
 
-The project uses a Makefile with these targets:
-- `make init` - Initialize project dependencies
-- `make watch` - Development mode with auto-reload (uses elm-live)
-- `make build` - Production build with optimization
-- `make test` - Run test suite
-- `make format` - Format all source files with elm-format
-- `make clean` - Remove build artifacts
+### Development Documentation
 
-## Architecture
+- **[Build and Development](./agents/build-and-dev.md)** - Nix environment, Makefile, development server, CI/CD pipeline
+- **[Testing](./agents/testing.md)** - TDD workflow, test organization, coverage reporting, manual testing
+- **[Workflow](./agents/workflow.md)** - Development process, commit conventions, task management
+- **[Dependencies](./agents/dependencies.md)** - Elm packages, vendor libraries, development tools
 
-### Data Model
+### Decision Records
 
-**Slide**: Individual presentation slide
-- content: String (markdown)
-- image: Maybe String (data URI)
+- **[ADR Directory](./agents/adr/)** - Architecture Decision Records documenting key technical choices
+  - [001: VIM Keybindings](./agents/adr/001-vim-keybindings.md)
 
-**Presentation**: Complete presentation
-- slides: List Slide
-- title: String
-- author: String
-- created: String
+## Quick Start
 
+<<<<<<< HEAD
 **Model**: Application state
 - mode: Mode (Edit | Present)
 - currentSlideIndex: Int
@@ -214,9 +217,15 @@ The project uses a Makefile with these targets:
 - draggedSlideIndex: Maybe Int (for drag and drop)
 - dropTargetIndex: Maybe Int (for visual placeholder)
 - language: Language (user's selected language)
+=======
+### Enter Development Environment
+>>>>>>> 49636f6 (Restructure AGENTS.md as index - Phase 9 of refactor)
 
-### Message Types
+```bash
+nix develop
+```
 
+<<<<<<< HEAD
 - Navigation: NextSlide, PrevSlide, GoToSlide Int
 - Mode switching: EnterPresentMode, ExitPresentMode
 - Slide management: AddSlide, AddSlideAfter Int, DeleteSlide Int, DuplicateSlide Int, MoveSlideUp Int, MoveSlideDown Int
@@ -227,17 +236,22 @@ The project uses a Makefile with these targets:
 - Keyboard: KeyPressed String Bool Bool
 - Storage: LocalStorageLoaded String, LanguageLoaded String
 - Language: ChangeLanguage Language
+=======
+### Common Commands
+>>>>>>> 49636f6 (Restructure AGENTS.md as index - Phase 9 of refactor)
 
-### View Organization
+```bash
+make watch    # Development server with hot reload
+make build    # Production build
+make test     # Run test suite
+make format   # Format all Elm files
+make coverage # Generate HTML coverage report
+make clean    # Remove build artifacts
+```
 
-- Edit mode: Sidebar (slide list) + Main (editor + preview)
-  - View.Edit module handles all edit mode UI
-  - Markdown preview with live rendering
-- Present mode: Full-screen slide renderer
-  - View.Present module handles presentation UI
-  - Rendered markdown with layout-specific display
-- Shared: MarkdownView module provides markdown rendering helper
+### Key File Locations
 
+<<<<<<< HEAD
 ### Update Architecture (Modular)
 
 **Update.elm**: Main coordinator module that routes all messages to specialized sub-modules.
@@ -312,15 +326,27 @@ in
 - Changes saved immediately when user switches language
 
 ## Development Workflow
+=======
+```
+src/
+├── Main.elm              # Application entry point
+├── Types.elm             # Core type definitions
+├── Json.elm              # JSON encoding/decoding
+├── Navigation.elm        # Navigation logic
+├── SlideManipulation.elm # Slide operations
+├── MarkdownView.elm      # Markdown rendering
+├── Ports.elm             # JavaScript interop
+└── View/
+    ├── Edit.elm          # Edit mode UI
+    └── Present.elm       # Presentation mode UI
+>>>>>>> 49636f6 (Restructure AGENTS.md as index - Phase 9 of refactor)
 
-1. Check TODO.md for current tasks
-2. Work on one task at a time
-3. Test changes (unit tests or manual verification)
-4. Format code: `make format`
-5. Commit with descriptive message
-6. Mark task as complete in TODO.md with commit hash
-7. Do NOT commit TODO.md itself
+tests/
+├── JsonTest.elm          # JSON tests
+├── NavigationTest.elm    # Navigation tests
+└── SlideManipulationTest.elm  # Slide manipulation tests
 
+<<<<<<< HEAD
 ## Test-Driven Development (TDD)
 
 **ENFORCE TDD** for all new features and bug fixes that involve business logic:
@@ -379,13 +405,43 @@ Core:
 
 Markdown:
 - dillonkearns/elm-markdown - Markdown parsing and rendering with custom renderer support
+=======
+agents/
+├── README.md             # Agent docs overview
+├── architecture.md       # System architecture
+├── data-model.md         # Data structures
+├── ui-components.md      # UI organization
+├── build-and-dev.md      # Build and development
+├── testing.md            # Testing strategy
+├── workflow.md           # Development workflow
+├── dependencies.md       # Dependencies
+└── adr/                  # Architecture decisions
+```
+>>>>>>> 49636f6 (Restructure AGENTS.md as index - Phase 9 of refactor)
 
 ## Notes for LLM Agents
 
-- TODO.md contains the task queue - work through items sequentially
-- This file (AGENTS.md) is for agent documentation - keep it updated
-- Test each change before committing
-- Never commit TODO.md
-- Don't chain shell commands with && (as per TODO.md instructions)
-- Each commit should represent one complete task
-- Use the existing nix flake environment for all operations
+- **TODO.md** contains the task queue - work through items sequentially
+- **This file (AGENTS.md)** is the agent documentation index - keep it updated
+- **Test each change** before committing (see [Testing](./agents/testing.md))
+- **Never commit TODO.md** - it's working memory, not repository content
+- **Don't chain shell commands** with && (see [Workflow](./agents/workflow.md))
+- **Each commit** should represent one complete task
+- **Use nix environment** for all operations (see [Build and Development](./agents/build-and-dev.md))
+- **Follow TDD** for business logic (see [Testing](./agents/testing.md))
+
+## Agent Workflow Summary
+
+1. Read TODO.md for current tasks
+2. Read relevant detailed docs (architecture, testing, etc.)
+3. Write test first (if applicable)
+4. Implement feature
+5. Run tests: `make test`
+6. Format code: `make format`
+7. Commit with clear message
+8. Update TODO.md with commit hash
+9. Update agent docs if needed
+10. Move to next task
+
+For complete workflow details, see [Workflow Documentation](./agents/workflow.md).
+
