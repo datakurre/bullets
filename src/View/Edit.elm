@@ -92,6 +92,7 @@ viewSlideItem model index slide =
             , preventDefaultOn "dragover" (Decode.succeed ( DragOver index, True ))
             , on "drop" (Decode.succeed (Drop index))
             , attribute "role" "listitem"
+            , attribute "tabindex" "0"
             , if isActive then
                 attribute "aria-current" "true"
 
