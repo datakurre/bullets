@@ -897,33 +897,72 @@
                 }
                 
                 if (!imagePath) {
+                    console.log('No image path found in relationships');
                     return null;
                 }
                 
-                // Resolve image path
-                const fullImagePath = 'ppt/slides/' + imagePath;
+                console.log('Found image path:', imagePath);
+                
+                // Resolve image path - handle relative paths
+                let fullImagePath;
+                if (imagePath.startsWith('../')) {
+                    // Relative path from ppt/slides/ going up to ppt/
+                    fullImagePath = 'ppt/' + imagePath.substring(3);
+                } else if (imagePath.startsWith('/')) {
+                    // Absolute path from root
+                    fullImagePath = imagePath.substring(1);
+                } else {
+                    // Relative path in same directory as slide
+                    fullImagePath = 'ppt/slides/' + imagePath;
+                }
+                
+                console.log('Resolved image path:', fullImagePath);
+                
                 const imageFile = zip.file(fullImagePath);
                 
                 if (!imageFile) {
-                    return null;
+                    console.warn('Image file not found at:', fullImagePath);
+                    // Try alternate paths
+                    const alternatePath = 'ppt/media/' + imagePath.split('/').pop();
+                    console.log('Trying alternate path:', alternatePath);
+                    const altImageFile = zip.file(alternatePath);
+                    if (!altImageFile) {
+                        return null;
+                    }
+                    return await extractImageData(altImageFile, imagePath);
                 }
                 
+                return await extractImageData(imageFile, imagePath);
+            } catch (error) {
+                console.error('Error extracting image:', error);
+                return null;
+            }
+        }
+
+        async function extractImageData(imageFile, imagePath) {
+            try {
                 // Read image as base64
                 const imageData = await imageFile.async('base64');
                 
                 // Determine mime type from extension
                 let mimeType = 'image/png';
-                if (imagePath.endsWith('.jpg') || imagePath.endsWith('.jpeg')) {
+                const lowerPath = imagePath.toLowerCase();
+                if (lowerPath.endsWith('.jpg') || lowerPath.endsWith('.jpeg')) {
                     mimeType = 'image/jpeg';
-                } else if (imagePath.endsWith('.gif')) {
+                } else if (lowerPath.endsWith('.gif')) {
                     mimeType = 'image/gif';
-                } else if (imagePath.endsWith('.bmp')) {
+                } else if (lowerPath.endsWith('.bmp')) {
                     mimeType = 'image/bmp';
+                } else if (lowerPath.endsWith('.svg')) {
+                    mimeType = 'image/svg+xml';
+                } else if (lowerPath.endsWith('.webp')) {
+                    mimeType = 'image/webp';
                 }
                 
+                console.log('Successfully extracted image:', imagePath, 'as', mimeType);
                 return `data:${mimeType};base64,${imageData}`;
             } catch (error) {
-                console.warn('Could not extract image:', error);
+                console.error('Error reading image data:', error);
                 return null;
             }
         }
