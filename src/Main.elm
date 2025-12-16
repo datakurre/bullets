@@ -55,6 +55,93 @@ init _ =
 -- UPDATE
 
 
+{-| Helper: Handle presentation mode keyboard shortcuts
+-}
+handlePresentModeKey : String -> Model -> ( Model, Cmd Msg )
+handlePresentModeKey key model =
+    case key of
+        "ArrowRight" ->
+            update NextSlide model
+
+        " " ->
+            update NextSlide model
+
+        "Enter" ->
+            update NextSlide model
+
+        "ArrowLeft" ->
+            update PrevSlide model
+
+        -- VIM keybindings for presentation mode
+        "j" ->
+            update NextSlide model
+
+        "k" ->
+            update PrevSlide model
+
+        "h" ->
+            update PrevSlide model
+
+        "l" ->
+            update NextSlide model
+
+        "g" ->
+            update (GoToSlide 0) model
+
+        "G" ->
+            let
+                lastIndex =
+                    List.length model.presentation.slides - 1
+            in
+            update (GoToSlide lastIndex) model
+
+        _ ->
+            ( model, Cmd.none )
+
+
+{-| Helper: Handle edit mode keyboard shortcuts (when textarea not focused)
+-}
+handleEditModeKey : String -> Model -> ( Model, Cmd Msg )
+handleEditModeKey key model =
+    if model.isTextareaFocused then
+        ( model, Cmd.none )
+
+    else
+        case key of
+            "j" ->
+                let
+                    maxIndex =
+                        List.length model.presentation.slides - 1
+
+                    newIndex =
+                        min maxIndex (model.currentSlideIndex + 1)
+                in
+                update (GoToSlide newIndex) model
+
+            "k" ->
+                let
+                    newIndex =
+                        max 0 (model.currentSlideIndex - 1)
+                in
+                update (GoToSlide newIndex) model
+
+            "p" ->
+                update EnterPresentMode model
+
+            "g" ->
+                update (GoToSlide 0) model
+
+            "G" ->
+                let
+                    lastIndex =
+                        List.length model.presentation.slides - 1
+                in
+                update (GoToSlide lastIndex) model
+
+            _ ->
+                ( model, Cmd.none )
+
+
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     let
@@ -497,85 +584,10 @@ update msg model =
                     else
                         case model.mode of
                             Present ->
-                                case key of
-                                    "ArrowRight" ->
-                                        update NextSlide model
-
-                                    " " ->
-                                        update NextSlide model
-
-                                    "Enter" ->
-                                        update NextSlide model
-
-                                    "ArrowLeft" ->
-                                        update PrevSlide model
-
-                                    -- VIM keybindings for presentation mode
-                                    "j" ->
-                                        update NextSlide model
-
-                                    "k" ->
-                                        update PrevSlide model
-
-                                    "h" ->
-                                        update PrevSlide model
-
-                                    "l" ->
-                                        update NextSlide model
-
-                                    "g" ->
-                                        update (GoToSlide 0) model
-
-                                    "G" ->
-                                        let
-                                            lastIndex =
-                                                List.length model.presentation.slides - 1
-                                        in
-                                        update (GoToSlide lastIndex) model
-
-                                    _ ->
-                                        ( model, Cmd.none )
+                                handlePresentModeKey key model
 
                             Edit ->
-                                -- VIM keybindings for edit mode (when not in textarea)
-                                -- Ignore keyboard shortcuts if textarea is focused
-                                if model.isTextareaFocused then
-                                    ( model, Cmd.none )
-
-                                else
-                                    case key of
-                                        "j" ->
-                                            let
-                                                maxIndex =
-                                                    List.length model.presentation.slides - 1
-
-                                                newIndex =
-                                                    min maxIndex (model.currentSlideIndex + 1)
-                                            in
-                                            update (GoToSlide newIndex) model
-
-                                        "k" ->
-                                            let
-                                                newIndex =
-                                                    max 0 (model.currentSlideIndex - 1)
-                                            in
-                                            update (GoToSlide newIndex) model
-
-                                        "p" ->
-                                            update EnterPresentMode model
-
-                                        "g" ->
-                                            update (GoToSlide 0) model
-
-                                        "G" ->
-                                            let
-                                                lastIndex =
-                                                    List.length model.presentation.slides - 1
-                                            in
-                                            update (GoToSlide lastIndex) model
-
-                                        _ ->
-                                            ( model, Cmd.none )
+                                handleEditModeKey key model
 
         -- DRAG AND DROP
         -- Handle slide reordering via drag and drop
