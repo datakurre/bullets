@@ -149,6 +149,36 @@ The project uses a Makefile with these targets:
 6. Mark task as complete in TODO.md with commit hash
 7. Do NOT commit TODO.md itself
 
+## Test-Driven Development (TDD)
+
+**ENFORCE TDD** for all new features and bug fixes that involve business logic:
+
+### TDD Workflow
+1. **Write the test first**: Before implementing any new logic, write a failing test that describes the desired behavior
+2. **Run tests to confirm failure**: Verify the test fails for the right reason (`make test`)
+3. **Implement the minimal code**: Write just enough code to make the test pass
+4. **Run tests to confirm success**: Verify all tests pass (`make test`)
+5. **Refactor if needed**: Improve the code while keeping tests green
+6. **Format code**: Run `make format` before committing
+
+### When to Apply TDD
+- **ALWAYS** for pure functions (encoders, decoders, transformations, utilities)
+- **ALWAYS** for business logic (slide manipulation, navigation logic, data validation)
+- **ALWAYS** for bug fixes (write a test that reproduces the bug first)
+- UI changes may be tested manually if unit testing is impractical
+
+### Test Organization
+- Place tests in `tests/` directory matching source module names
+- Group related tests using `describe` blocks
+- Use descriptive test names that explain what is being tested
+- Each test should focus on one specific behavior
+- Maintain high test coverage for critical paths
+
+### Current Test Coverage
+- 72 unit tests covering core functionality
+- Focus areas: JSON serialization, navigation logic, slide manipulation
+- Run `make coverage` to generate HTML coverage report
+
 ## Code Style
 
 - Use elm-format standard formatting
