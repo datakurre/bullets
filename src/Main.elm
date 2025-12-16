@@ -5,8 +5,9 @@ import Browser.Events
 import File
 import File.Download as Download
 import File.Select as Select
-import Html exposing (Html, div)
+import Html exposing (Html, button, div, h2, h3, span, text)
 import Html.Attributes exposing (class)
+import Html.Events exposing (custom, onClick)
 import Json as AppJson
 import Json.Decode as Decode
 import Json.Encode as Encode
@@ -309,107 +310,128 @@ update msg model =
             ( { model | presentation = updatedPresentation }, savePresentation updatedPresentation )
 
         KeyPressed key ->
-            case model.mode of
-                Present ->
-                    case key of
-                        "ArrowRight" ->
-                            update NextSlide model
+            case key of
+                -- Help dialog toggle (works in both modes, but only when help is not shown)
+                "?" ->
+                    update ToggleHelpDialog model
 
-                        " " ->
-                            update NextSlide model
+                "Escape" ->
+                    -- ESC closes help dialog if open, otherwise normal behavior
+                    if model.showHelpDialog then
+                        update ToggleHelpDialog model
 
-                        "Enter" ->
-                            update NextSlide model
+                    else
+                        case model.mode of
+                            Present ->
+                                update ExitPresentMode model
 
-                        "ArrowLeft" ->
-                            update PrevSlide model
+                            Edit ->
+                                ( model, Cmd.none )
 
-                        "Escape" ->
-                            update ExitPresentMode model
-
-                        -- VIM keybindings for presentation mode
-                        "j" ->
-                            update NextSlide model
-
-                        "k" ->
-                            update PrevSlide model
-
-                        "h" ->
-                            update PrevSlide model
-
-                        "l" ->
-                            update NextSlide model
-
-                        "g" ->
-                            update (GoToSlide 0) model
-
-                        "G" ->
-                            let
-                                lastIndex =
-                                    List.length model.presentation.slides - 1
-                            in
-                            update (GoToSlide lastIndex) model
-
-                        _ ->
-                            ( model, Cmd.none )
-
-                Edit ->
-                    -- VIM keybindings for edit mode (when not in textarea)
-                    -- Ignore keyboard shortcuts if textarea is focused
-                    if model.isTextareaFocused then
+                _ ->
+                    -- Don't handle other keys if help dialog is shown
+                    if model.showHelpDialog then
                         ( model, Cmd.none )
 
                     else
-                        case key of
-                            "j" ->
-                                let
-                                    maxIndex =
-                                        List.length model.presentation.slides - 1
+                        case model.mode of
+                            Present ->
+                                case key of
+                                    "ArrowRight" ->
+                                        update NextSlide model
 
-                                    newIndex =
-                                        min maxIndex (model.currentSlideIndex + 1)
-                                in
-                                update (GoToSlide newIndex) model
+                                    " " ->
+                                        update NextSlide model
 
-                            "k" ->
-                                let
-                                    newIndex =
-                                        max 0 (model.currentSlideIndex - 1)
-                                in
-                                update (GoToSlide newIndex) model
+                                    "Enter" ->
+                                        update NextSlide model
 
-                            "ArrowDown" ->
-                                let
-                                    maxIndex =
-                                        List.length model.presentation.slides - 1
+                                    "ArrowLeft" ->
+                                        update PrevSlide model
 
-                                    newIndex =
-                                        min maxIndex (model.currentSlideIndex + 1)
-                                in
-                                update (GoToSlide newIndex) model
+                                    -- VIM keybindings for presentation mode
+                                    "j" ->
+                                        update NextSlide model
 
-                            "ArrowUp" ->
-                                let
-                                    newIndex =
-                                        max 0 (model.currentSlideIndex - 1)
-                                in
-                                update (GoToSlide newIndex) model
+                                    "k" ->
+                                        update PrevSlide model
 
-                            "p" ->
-                                update EnterPresentMode model
+                                    "h" ->
+                                        update PrevSlide model
 
-                            "g" ->
-                                update (GoToSlide 0) model
+                                    "l" ->
+                                        update NextSlide model
 
-                            "G" ->
-                                let
-                                    lastIndex =
-                                        List.length model.presentation.slides - 1
-                                in
-                                update (GoToSlide lastIndex) model
+                                    "g" ->
+                                        update (GoToSlide 0) model
 
-                            _ ->
-                                ( model, Cmd.none )
+                                    "G" ->
+                                        let
+                                            lastIndex =
+                                                List.length model.presentation.slides - 1
+                                        in
+                                        update (GoToSlide lastIndex) model
+
+                                    _ ->
+                                        ( model, Cmd.none )
+
+                            Edit ->
+                                -- VIM keybindings for edit mode (when not in textarea)
+                                -- Ignore keyboard shortcuts if textarea is focused
+                                if model.isTextareaFocused then
+                                    ( model, Cmd.none )
+
+                                else
+                                    case key of
+                                        "j" ->
+                                            let
+                                                maxIndex =
+                                                    List.length model.presentation.slides - 1
+
+                                                newIndex =
+                                                    min maxIndex (model.currentSlideIndex + 1)
+                                            in
+                                            update (GoToSlide newIndex) model
+
+                                        "k" ->
+                                            let
+                                                newIndex =
+                                                    max 0 (model.currentSlideIndex - 1)
+                                            in
+                                            update (GoToSlide newIndex) model
+
+                                        "ArrowDown" ->
+                                            let
+                                                maxIndex =
+                                                    List.length model.presentation.slides - 1
+
+                                                newIndex =
+                                                    min maxIndex (model.currentSlideIndex + 1)
+                                            in
+                                            update (GoToSlide newIndex) model
+
+                                        "ArrowUp" ->
+                                            let
+                                                newIndex =
+                                                    max 0 (model.currentSlideIndex - 1)
+                                            in
+                                            update (GoToSlide newIndex) model
+
+                                        "p" ->
+                                            update EnterPresentMode model
+
+                                        "g" ->
+                                            update (GoToSlide 0) model
+
+                                        "G" ->
+                                            let
+                                                lastIndex =
+                                                    List.length model.presentation.slides - 1
+                                            in
+                                            update (GoToSlide lastIndex) model
+
+                                        _ ->
+                                            ( model, Cmd.none )
 
         DragStart index ->
             ( { model | draggedSlideIndex = Just index }, Cmd.none )
@@ -520,8 +542,10 @@ update msg model =
                     ( newModel, savePresentation presentation )
 
                 Err _ ->
-                    -- If decode fails, it might be an error message
                     ( model, Cmd.none )
+
+        ToggleHelpDialog ->
+            ( { model | showHelpDialog = not model.showHelpDialog }, Cmd.none )
 
 
 savePresentation : Presentation -> Cmd Msg
@@ -568,4 +592,52 @@ view model =
 
             Present ->
                 viewPresentMode model
+        , if model.showHelpDialog then
+            viewHelpDialog
+
+          else
+            text ""
         ]
+
+
+viewHelpDialog : Html Msg
+viewHelpDialog =
+    div [ class "help-overlay", onClick ToggleHelpDialog ]
+        [ div [ class "help-dialog" ]
+            [ div [ class "help-header" ]
+                [ h2 [] [ text "Keyboard Shortcuts" ]
+                , button [ class "help-close", onClick ToggleHelpDialog ] [ text "×" ]
+                ]
+            , div [ class "help-content" ]
+                [ div [ class "help-section" ]
+                    [ h3 [] [ text "Navigation" ]
+                    , viewShortcut "↑ / k" "Previous slide"
+                    , viewShortcut "↓ / j" "Next slide"
+                    , viewShortcut "g" "First slide"
+                    , viewShortcut "G" "Last slide"
+                    ]
+                , div [ class "help-section" ]
+                    [ h3 [] [ text "Presentation Mode" ]
+                    , viewShortcut "p" "Enter presentation mode"
+                    , viewShortcut "ESC" "Exit presentation mode"
+                    , viewShortcut "Space / Enter / →" "Next slide (in present mode)"
+                    , viewShortcut "← / h" "Previous slide (in present mode)"
+                    , viewShortcut "l" "Next slide (in present mode)"
+                    ]
+                , div [ class "help-section" ]
+                    [ h3 [] [ text "Help" ]
+                    , viewShortcut "?" "Toggle this help dialog"
+                    , viewShortcut "ESC" "Close this help dialog"
+                    ]
+                ]
+            ]
+        ]
+
+
+viewShortcut : String -> String -> Html msg
+viewShortcut keys description =
+    div [ class "help-shortcut" ]
+        [ span [ class "help-keys" ] [ text keys ]
+        , span [ class "help-description" ] [ text description ]
+        ]
+

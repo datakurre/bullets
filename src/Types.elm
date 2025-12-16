@@ -41,6 +41,7 @@ type alias Model =
     , draggedSlideIndex : Maybe Int
     , dropTargetIndex : Maybe Int
     , isTextareaFocused : Bool
+    , showHelpDialog : Bool
     }
 
 
@@ -72,6 +73,7 @@ type Msg
     | ExportToPPTX
     | ImportPPTXRequested
     | PPTXImported String
+    | ToggleHelpDialog
 
 
 
@@ -103,4 +105,5 @@ initialModel =
     , draggedSlideIndex = Nothing
     , dropTargetIndex = Nothing
     , isTextareaFocused = False
+    , showHelpDialog = False
     }
