@@ -10,6 +10,7 @@ import Html.Attributes exposing (class)
 import Json as AppJson
 import Json.Decode as Decode
 import Json.Encode as Encode
+import Navigation
 import Ports
 import SlideManipulation
 import Task
@@ -54,23 +55,23 @@ update msg model =
     case msg of
         NextSlide ->
             let
-                maxIndex =
-                    List.length model.presentation.slides - 1
+                totalSlides =
+                    List.length model.presentation.slides
 
                 newIndex =
-                    min maxIndex (model.currentSlideIndex + 1)
+                    Navigation.nextSlide model.currentSlideIndex totalSlides
             in
             ( { model | currentSlideIndex = newIndex }, Cmd.none )
 
         PrevSlide ->
             let
                 newIndex =
-                    max 0 (model.currentSlideIndex - 1)
+                    Navigation.prevSlide model.currentSlideIndex
             in
             ( { model | currentSlideIndex = newIndex }, Cmd.none )
 
         GoToSlide index ->
-            ( { model | currentSlideIndex = index }, Cmd.none )
+            ( { model | currentSlideIndex = Navigation.goToSlide index }, Cmd.none )
 
         EnterPresentMode ->
             ( { model | mode = Present }, Cmd.none )
