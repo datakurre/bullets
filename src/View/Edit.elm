@@ -27,9 +27,7 @@ viewSidebar model =
             (List.indexedMap (viewSlideItem model) model.presentation.slides)
         , div [ class "sidebar-footer" ]
             [ button [ onClick EnterPresentMode, class "btn-present" ] [ text "▶ Present" ]
-            , button [ onClick LoadJSONRequested, class "btn-load" ] [ text "📁 Load" ]
             , button [ onClick ImportPPTXRequested, class "btn-import-pptx" ] [ text "📥 Import PPTX" ]
-            , button [ onClick DownloadJSON, class "btn-save" ] [ text "💾 Save" ]
             , button [ onClick ExportToPPTX, class "btn-export" ] [ text "📊 Export PPTX" ]
             ]
         ]

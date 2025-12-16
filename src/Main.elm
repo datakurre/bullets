@@ -329,45 +329,6 @@ update msg model =
             in
             ( { model | presentation = updatedPresentation }, savePresentation updatedPresentation )
 
-        DownloadJSON ->
-            let
-                json =
-                    AppJson.encodePresentation model.presentation
-
-                jsonString =
-                    Encode.encode 2 json
-
-                filename =
-                    model.presentation.title ++ ".json"
-            in
-            ( model, Download.string filename "application/json" jsonString )
-
-        LoadJSONRequested ->
-            ( model, Select.file [ "application/json" ] FileSelected )
-
-        FileSelected file ->
-            ( model, Task.perform FileLoaded (File.toString file) )
-
-        FileLoaded content ->
-            case Decode.decodeString AppJson.decodePresentation content of
-                Ok presentation ->
-                    let
-                        firstSlideContent =
-                            List.head presentation.slides
-                                |> Maybe.map .content
-                                |> Maybe.withDefault ""
-                    in
-                    ( { model
-                        | presentation = presentation
-                        , currentSlideIndex = 0
-                        , editingContent = firstSlideContent
-                      }
-                    , Cmd.none
-                    )
-
-                Err _ ->
-                    ( model, Cmd.none )
-
         KeyPressed key ->
             case model.mode of
                 Present ->

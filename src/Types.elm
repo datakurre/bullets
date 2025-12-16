@@ -65,10 +65,6 @@ type Msg
     | ChangeLayout SlideLayout
     | ImagePasted String
     | RemoveImage
-    | DownloadJSON
-    | LoadJSONRequested
-    | FileSelected File
-    | FileLoaded String
     | ImageUploadRequested
     | ImageFileSelected File
     | ImageFileLoaded String
