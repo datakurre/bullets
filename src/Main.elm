@@ -5,8 +5,8 @@ import Browser.Events
 import File
 import File.Download as Download
 import File.Select as Select
-import Html exposing (Html, a, button, div, h2, h3, option, select, span, text)
-import Html.Attributes exposing (class, href, selected, value)
+import Html exposing (Html, a, div, text)
+import Html.Attributes exposing (class, href)
 import Html.Events exposing (custom, onClick, onInput)
 import I18n
 import Json as AppJson
@@ -18,6 +18,7 @@ import SlideManipulation
 import Task
 import Types exposing (Mode(..), Model, Msg(..), Presentation, initialModel)
 import View.Edit exposing (viewEditMode)
+import View.HelpDialog
 import View.Present exposing (viewPresentMode)
 
 
@@ -750,7 +751,7 @@ view model =
             Present ->
                 viewPresentMode model
         , if model.showHelpDialog then
-            viewHelpDialog t
+            View.HelpDialog.view t ToggleHelpDialog
 
           else
             text ""
@@ -771,56 +772,3 @@ viewLiveRegion announcement =
         , Html.Attributes.attribute "aria-atomic" "true"
         ]
         [ text announcement ]
-
-
-viewHelpDialog : I18n.Translations -> Html Msg
-viewHelpDialog t =
-    div [ class "help-overlay", onClick ToggleHelpDialog ]
-        [ div [ class "help-dialog" ]
-            [ div [ class "help-header" ]
-                [ h2 [] [ text t.keyboardShortcuts ]
-                , button [ class "help-close", onClick ToggleHelpDialog ] [ text "×" ]
-                ]
-            , div [ class "help-content" ]
-                [ div [ class "help-section" ]
-                    [ h3 [] [ text t.navigation ]
-                    , viewShortcut "↑ / k" t.previousSlide
-                    , viewShortcut "↓ / j" t.nextSlide
-                    , viewShortcut "g" t.firstSlide
-                    , viewShortcut "G" t.lastSlide
-                    ]
-                , div [ class "help-section" ]
-                    [ h3 [] [ text t.slideManagement ]
-                    , viewShortcut "Ctrl+Shift+↑" t.reorderSlideUp
-                    , viewShortcut "Ctrl+Shift+↓" t.reorderSlideDown
-                    ]
-                , div [ class "help-section" ]
-                    [ h3 [] [ text t.fileOperations ]
-                    , viewShortcut "Ctrl+I" t.uploadImageFile
-                    , viewShortcut "Ctrl+O" t.importFile
-                    , viewShortcut "Ctrl+S" t.exportFile
-                    ]
-                , div [ class "help-section" ]
-                    [ h3 [] [ text t.enterPresentation ]
-                    , viewShortcut "p" t.enterPresentation
-                    , viewShortcut "ESC" t.exitPresentation
-                    , viewShortcut "Space / Enter / →" (t.nextSlide ++ " (" ++ t.enterPresentation ++ ")")
-                    , viewShortcut "← / h" (t.previousSlide ++ " (" ++ t.enterPresentation ++ ")")
-                    , viewShortcut "l" (t.nextSlide ++ " (" ++ t.enterPresentation ++ ")")
-                    ]
-                , div [ class "help-section" ]
-                    [ h3 [] [ text t.other ]
-                    , viewShortcut "?" t.showHelp
-                    , viewShortcut "ESC" t.close
-                    ]
-                ]
-            ]
-        ]
-
-
-viewShortcut : String -> String -> Html msg
-viewShortcut keys description =
-    div [ class "help-shortcut" ]
-        [ span [ class "help-keys" ] [ text keys ]
-        , span [ class "help-description" ] [ text description ]
-        ]
