@@ -27,15 +27,16 @@
 - Comprehensive unit test suite (80 tests)
 - elm-review integration for code quality
 - **Comprehensive accessibility support (WCAG 2.1 AA)**: ARIA labels, keyboard navigation, focus management, screen reader announcements, help dialog
+- **Internationalization (i18n)**: Multi-language support with English and Finnish translations, language selector UI, local storage persistence
 
 Recent commits:
-- 03dabf8: Center icons in slide-item buttons
-- bad5c49: Show image thumbnails in slide navigation toolbar
-- a76783c: Add TDD enforcement documentation to AGENTS.md
-- 387a41d: Add visual placeholder for drag and drop - Phase 2
-- d22680b: Add drop target tracking for drag and drop - Phase 1
-- 91e9b32: Remove layout selector and automatically determine layout
-- a020265: Remove Load and Save JSON actions
+- b3f0c21: Move add-slide button to slide actions
+- 7ceb5e0: Fix UI vertical growth by adding min-height constraints
+- 7024246: Implement i18n with English and Finnish support
+- ab85857: Fix slide navigation scrolling
+- 59052b4: Make presentation title editable
+- 54500ee: Fix action buttons visibility
+- 37bf36d: Fix vertical layout issues
 
 ## Current Features
 
@@ -208,18 +209,20 @@ The project uses a Makefile with these targets:
 - editingContent: String (buffer for current edits)
 - draggedSlideIndex: Maybe Int (for drag and drop)
 - dropTargetIndex: Maybe Int (for visual placeholder)
+- language: Language (user's selected language)
 
 ### Message Types
 
 - Navigation: NextSlide, PrevSlide, GoToSlide Int
 - Mode switching: EnterPresentMode, ExitPresentMode
-- Slide management: AddSlide, DeleteSlide Int, DuplicateSlide Int, MoveSlideUp Int, MoveSlideDown Int
+- Slide management: AddSlide, AddSlideAfter Int, DeleteSlide Int, DuplicateSlide Int, MoveSlideUp Int, MoveSlideDown Int
 - Drag and drop: DragStart Int, DragOver Int, DragEnd, Drop Int
-- Content editing: UpdateContent String
+- Content editing: UpdateContent String, UpdateTitle String
 - Image handling: ImagePasted String, ImageUploadRequested, ImageFileSelected File, ImageFileLoaded String, RemoveImage
 - File operations: ImportPPTXRequested, PPTXFileSelected File, PPTXLoaded String, ExportToPPTX
-- Keyboard: KeyPressed String
-- Storage: LocalStorageLoaded String
+- Keyboard: KeyPressed String Bool Bool
+- Storage: LocalStorageLoaded String, LanguageLoaded String
+- Language: ChangeLanguage Language
 
 ### View Organization
 
@@ -230,6 +233,44 @@ The project uses a Makefile with these targets:
   - View.Present module handles presentation UI
   - Rendered markdown with layout-specific display
 - Shared: MarkdownView module provides markdown rendering helper
+
+### Internationalization (i18n)
+
+**Language Support**: Currently supports English (default) and Finnish.
+
+**Architecture**:
+- `I18n` module provides type-safe translation system
+- `Language` union type (English | Finnish) for compile-time safety
+- `Translations` record type ensures all translations present
+- Language preference persisted to local storage
+
+**Translation Pattern**:
+```elm
+let
+    t = I18n.translations model.language
+in
+    button [] [ text t.addSlide ]
+```
+
+**How to Add a New Language**:
+1. Add variant to `Language` type in `src/I18n.elm`
+2. Add translation function for the new language (follow `english` or `finnish` pattern)
+3. Update `translations` function to handle new language
+4. Add encoding/decoding support in `encodeLanguage` and `decodeLanguage`
+5. Update language selector in `View.Edit.viewLanguageSelector`
+6. Add new option to the dropdown with appropriate label
+
+**Translation Key Naming**:
+- Use camelCase for translation keys
+- Group related translations (e.g., `addSlide`, `deleteSlide`)
+- Use descriptive names that indicate UI context
+- Keep ARIA label keys explicit (e.g., `moveSlideUp` vs `moveSlideUpLabel`)
+
+**Storage**:
+- Language preference stored separately from presentation data
+- Key: `LANGUAGE_KEY` in localStorage
+- Automatically loaded on app initialization
+- Changes saved immediately when user switches language
 
 ## Development Workflow
 
