@@ -24,8 +24,9 @@
 - Keyboard shortcuts disabled while editing in textarea
 - Image thumbnails in slide navigation toolbar
 - GitHub Pages deployment workflow with test coverage
-- Comprehensive unit test suite (72 tests)
+- Comprehensive unit test suite (80 tests)
 - elm-review integration for code quality
+- **Comprehensive accessibility support (WCAG 2.1 AA)**: ARIA labels, keyboard navigation, focus management, screen reader announcements, help dialog
 
 Recent commits:
 - 03dabf8: Center icons in slide-item buttons
@@ -72,6 +73,97 @@ A minimal, elegant presentation tool that:
 - Features a clean left-aligned design with consistent styling
 
 ✅ **All vision items are now implemented!**
+
+## Accessibility (A11y)
+
+**ENFORCE ACCESSIBILITY** for all UI features and interactions following WCAG 2.1 AA guidelines:
+
+### Core Accessibility Features
+
+The application implements comprehensive accessibility support:
+
+#### Semantic HTML and ARIA
+- Proper landmark regions: `<nav>`, `<main>`, `<aside>` with appropriate `role` and `aria-label` attributes
+- ARIA labels on all interactive buttons for screen reader users
+- `role="list"` and `role="listitem"` for slide navigation
+- `aria-current="true"` indicates active slide in list
+- `role="toolbar"` for button groups
+- Live region announcements (`aria-live="polite"`) for:
+  - Slide navigation changes
+  - Mode transitions (entering/exiting presentation)
+  - Slide operations (add, delete, duplicate, reorder)
+
+#### Keyboard Navigation
+- **Full keyboard accessibility**: All features available without mouse
+- **VIM-style navigation**: j/k for next/prev slide, g/G for first/last, p for present
+- **Arrow key navigation**: Up/Down arrows in edit mode, all arrows in present mode
+- **Keyboard slide reordering**: Ctrl+Shift+Up/Down to move slides
+- **File operations**: Ctrl+O for import, Ctrl+I for image upload, Ctrl+S for export
+- **Help dialog**: Press '?' to view all keyboard shortcuts, ESC to close
+- **Skip to content link**: Visible on focus, jumps to main content area
+- Keyboard shortcuts automatically disabled while editing in textarea
+
+#### Focus Management
+- Visible focus indicators on all interactive elements (3px solid outline with sufficient contrast)
+- Logical focus order through interactive elements
+- Focus indicators styled for both light and dark active states
+
+#### Visual Accessibility
+- High-contrast light theme (beige background #f5f5f0, dark text #1a1a1a)
+- Consistent focus indicators with 3:1 minimum contrast ratio
+- Hover states on all interactive elements for visual feedback
+- Visual placeholder during drag and drop operations
+
+### Accessibility Requirements for New Features
+
+When implementing new features, **ALWAYS**:
+
+1. **Keyboard Accessibility**:
+   - Ensure all functionality is keyboard-accessible (no mouse-only interactions)
+   - Test with Tab, Shift+Tab, Enter, Space, Arrow keys, ESC
+   - Add keyboard shortcuts for frequently used actions
+   - Disable global shortcuts when user is typing in input fields
+
+2. **Screen Reader Support**:
+   - Add appropriate ARIA labels (`aria-label`, `aria-labelledby`)
+   - Use semantic HTML elements (button, nav, main, aside)
+   - Provide meaningful `role` attributes where needed
+   - Announce dynamic changes with live regions (`aria-live`)
+   - Set `aria-current` for current/active items
+
+3. **Focus Management**:
+   - Ensure logical tab order
+   - Add visible focus indicators (`:focus` styles)
+   - Use `:focus-visible` for keyboard-only focus indicators
+   - Maintain focus context during mode transitions
+
+4. **Visual Design**:
+   - Maintain 4.5:1 contrast ratio for normal text
+   - Maintain 3:1 contrast ratio for large text and UI components
+   - Use more than color alone to convey information
+   - Ensure focus indicators are clearly visible
+
+5. **Documentation**:
+   - Update help dialog with new keyboard shortcuts
+   - Add ARIA attributes to describe new interactive elements
+   - Document accessibility testing in TODO-A11Y.md
+
+### Testing Accessibility
+
+For any UI changes:
+- **Manual keyboard testing**: Navigate entire interface without mouse
+- **Screen reader testing**: Test with NVDA/JAWS (Windows), VoiceOver (macOS), Orca (Linux)
+- **Focus indicators**: Verify all interactive elements show clear focus
+- **Announcements**: Verify screen reader announces state changes
+- **Contrast**: Check color contrast ratios meet WCAG AA standards
+
+### Accessibility Resources
+
+- See TODO-A11Y.md for comprehensive accessibility task tracking
+- Phase 1 & 2 core tasks completed (ARIA, keyboard navigation, focus management)
+- Ongoing: Phase 3+ (color contrast audit, advanced features, testing)
+- Reference: [WCAG 2.1 Guidelines](https://www.w3.org/WAI/WCAG21/quickref/)
+- Reference: [ARIA Authoring Practices](https://www.w3.org/WAI/ARIA/apg/)
 
 ## Development Environment
 
@@ -175,7 +267,7 @@ The project uses a Makefile with these targets:
 - Maintain high test coverage for critical paths
 
 ### Current Test Coverage
-- 72 unit tests covering core functionality
+- 80 unit tests covering core functionality
 - Focus areas: JSON serialization, navigation logic, slide manipulation
 - Run `make coverage` to generate HTML coverage report
 
@@ -195,7 +287,7 @@ The project uses a Makefile with these targets:
 - Cross-browser testing before major releases
 - Focus on data integrity (JSON round-trip correctness)
 - Run elm-review for code quality checks
-- All tests pass: 72 unit tests currently in test suite
+- All tests pass: 80 unit tests currently in test suite
 
 ## Dependencies
 
