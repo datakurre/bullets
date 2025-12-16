@@ -229,6 +229,27 @@
             gap: 0.5rem;
         }
 
+        .language-selector {
+            width: 100%;
+            padding: 0.5rem;
+            border: 1px solid #d0d0c8;
+            border-radius: 4px;
+            background-color: #f5f5f0;
+            color: #1a1a1a;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+
+        .language-selector:hover {
+            background-color: #e8e8e0;
+        }
+
+        .language-selector:focus {
+            outline: 3px solid #2a7;
+            outline-offset: 2px;
+            border-color: #2a7;
+        }
+
         .editor {
             flex: 1;
             display: flex;
@@ -876,6 +897,7 @@
 
         // Local storage support
         var STORAGE_KEY = 'bullets-presentation';
+        var LANGUAGE_KEY = 'bullets-language';
 
         app.ports.saveToLocalStorage.subscribe(function(data) {
             try {
@@ -892,6 +914,25 @@
             } catch (e) {
                 console.error('Failed to load from local storage:', e);
                 app.ports.localStorageLoaded.send('');
+            }
+        });
+
+        // Language preference storage
+        app.ports.saveLanguagePreference.subscribe(function(data) {
+            try {
+                localStorage.setItem(LANGUAGE_KEY, data);
+            } catch (e) {
+                console.error('Failed to save language preference:', e);
+            }
+        });
+
+        app.ports.loadLanguagePreference.subscribe(function() {
+            try {
+                var data = localStorage.getItem(LANGUAGE_KEY);
+                app.ports.languageLoaded.send(data || '"en"');
+            } catch (e) {
+                console.error('Failed to load language preference:', e);
+                app.ports.languageLoaded.send('"en"');
             }
         });
 

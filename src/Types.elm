@@ -8,6 +8,7 @@ module Types exposing
     )
 
 import File exposing (File)
+import I18n exposing (Language)
 
 
 
@@ -43,6 +44,7 @@ type alias Model =
     , isTextareaFocused : Bool
     , showHelpDialog : Bool
     , announcement : String
+    , language : Language
     }
 
 
@@ -77,6 +79,8 @@ type Msg
     | ImportPPTXRequested
     | PPTXImported String
     | ToggleHelpDialog
+    | ChangeLanguage Language
+    | LanguageLoaded String
 
 
 
@@ -110,4 +114,5 @@ initialModel =
     , isTextareaFocused = False
     , showHelpDialog = False
     , announcement = ""
+    , language = I18n.defaultLanguage
     }

@@ -5,9 +5,10 @@ import Browser.Events
 import File
 import File.Download as Download
 import File.Select as Select
-import Html exposing (Html, a, button, div, h2, h3, span, text)
-import Html.Attributes exposing (class, href)
-import Html.Events exposing (custom, onClick)
+import Html exposing (Html, a, button, div, h2, h3, option, select, span, text)
+import Html.Attributes exposing (class, href, selected, value)
+import Html.Events exposing (custom, onClick, onInput)
+import I18n
 import Json as AppJson
 import Json.Decode as Decode
 import Json.Encode as Encode
@@ -44,6 +45,7 @@ init _ =
     , Cmd.batch
         [ Ports.setupImagePaste ()
         , Ports.loadFromLocalStorage ()
+        , Ports.loadLanguagePreference ()
         ]
     )
 
@@ -54,6 +56,10 @@ init _ =
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
+    let
+        t =
+            I18n.translations model.language
+    in
     case msg of
         NextSlide ->
             let
@@ -65,7 +71,7 @@ update msg model =
             in
             ( { model
                 | currentSlideIndex = newIndex
-                , announcement = "Slide " ++ String.fromInt (newIndex + 1) ++ " of " ++ String.fromInt totalSlides
+                , announcement = t.slideAnnouncement (newIndex + 1) totalSlides
               }
             , Cmd.none
             )
@@ -80,7 +86,7 @@ update msg model =
             in
             ( { model
                 | currentSlideIndex = newIndex
-                , announcement = "Slide " ++ String.fromInt (newIndex + 1) ++ " of " ++ String.fromInt totalSlides
+                , announcement = t.slideAnnouncement (newIndex + 1) totalSlides
               }
             , Cmd.none
             )
@@ -92,7 +98,7 @@ update msg model =
             in
             ( { model
                 | currentSlideIndex = Navigation.goToSlide index
-                , announcement = "Slide " ++ String.fromInt (index + 1) ++ " of " ++ String.fromInt totalSlides
+                , announcement = t.slideAnnouncement (index + 1) totalSlides
               }
             , Cmd.none
             )
@@ -100,7 +106,7 @@ update msg model =
         EnterPresentMode ->
             ( { model
                 | mode = Present
-                , announcement = "Entering presentation mode"
+                , announcement = t.enteringPresentMode
               }
             , Cmd.none
             )
@@ -108,7 +114,7 @@ update msg model =
         ExitPresentMode ->
             ( { model
                 | mode = Edit
-                , announcement = "Exiting presentation mode"
+                , announcement = t.exitingPresentMode
               }
             , Cmd.none
             )
@@ -135,7 +141,7 @@ update msg model =
                 | presentation = updatedPresentation
                 , currentSlideIndex = newIndex
                 , editingContent = Maybe.map .content newSlide |> Maybe.withDefault "# New Slide"
-                , announcement = "Slide added"
+                , announcement = t.slideAdded
               }
             , savePresentation updatedPresentation
             )
@@ -162,7 +168,7 @@ update msg model =
                 ( { model
                     | presentation = updatedPresentation
                     , currentSlideIndex = newIndex
-                    , announcement = "Slide deleted"
+                    , announcement = t.slideDeleted
                   }
                 , savePresentation updatedPresentation
                 )
@@ -180,7 +186,7 @@ update msg model =
             in
             ( { model
                 | presentation = updatedPresentation
-                , announcement = "Slide duplicated"
+                , announcement = t.slideDuplicated
               }
             , savePresentation updatedPresentation
             )
@@ -213,7 +219,7 @@ update msg model =
                 ( { model
                     | presentation = updatedPresentation
                     , currentSlideIndex = newIndex
-                    , announcement = "Slide moved up"
+                    , announcement = t.slideMovedUp
                   }
                 , savePresentation updatedPresentation
                 )
@@ -250,7 +256,7 @@ update msg model =
                 ( { model
                     | presentation = updatedPresentation
                     , currentSlideIndex = newIndex
-                    , announcement = "Slide moved down"
+                    , announcement = t.slideMovedDown
                   }
                 , savePresentation updatedPresentation
                 )
@@ -390,7 +396,7 @@ update msg model =
                             updatedModel =
                                 Tuple.first (update (MoveSlideUp model.currentSlideIndex) model)
                         in
-                        ( { updatedModel | announcement = "Slide moved up" }, Cmd.none )
+                        ( { updatedModel | announcement = t.slideMovedUp }, Cmd.none )
 
                     else if model.mode == Edit && not model.isTextareaFocused then
                         -- Regular arrow up navigation
@@ -410,7 +416,7 @@ update msg model =
                             updatedModel =
                                 Tuple.first (update (MoveSlideDown model.currentSlideIndex) model)
                         in
-                        ( { updatedModel | announcement = "Slide moved down" }, Cmd.none )
+                        ( { updatedModel | announcement = t.slideMovedDown }, Cmd.none )
 
                     else if model.mode == Edit && not model.isTextareaFocused then
                         -- Regular arrow down navigation
@@ -644,6 +650,24 @@ update msg model =
         ToggleHelpDialog ->
             ( { model | showHelpDialog = not model.showHelpDialog }, Cmd.none )
 
+        ChangeLanguage language ->
+            let
+                json =
+                    I18n.encodeLanguage language
+
+                jsonString =
+                    Encode.encode 0 json
+            in
+            ( { model | language = language }, Ports.saveLanguagePreference jsonString )
+
+        LanguageLoaded jsonString ->
+            case Decode.decodeString I18n.decodeLanguage jsonString of
+                Ok language ->
+                    ( { model | language = language }, Cmd.none )
+
+                Err _ ->
+                    ( model, Cmd.none )
+
 
 savePresentation : Presentation -> Cmd Msg
 savePresentation presentation =
@@ -668,6 +692,7 @@ subscriptions _ =
         , Ports.imagePasted ImagePasted
         , Ports.localStorageLoaded LocalStorageLoaded
         , Ports.pptxImported PPTXImported
+        , Ports.languageLoaded LanguageLoaded
         ]
 
 
@@ -685,8 +710,12 @@ keyDecoder =
 
 view : Model -> Html Msg
 view model =
+    let
+        t =
+            I18n.translations model.language
+    in
     div [ class "app" ]
-        [ viewSkipLink
+        [ viewSkipLink t
         , case model.mode of
             Edit ->
                 viewEditMode model
@@ -694,7 +723,7 @@ view model =
             Present ->
                 viewPresentMode model
         , if model.showHelpDialog then
-            viewHelpDialog
+            viewHelpDialog t
 
           else
             text ""
@@ -702,9 +731,9 @@ view model =
         ]
 
 
-viewSkipLink : Html msg
-viewSkipLink =
-    a [ class "skip-link", href "#main-content" ] [ text "Skip to main content" ]
+viewSkipLink : I18n.Translations -> Html msg
+viewSkipLink t =
+    a [ class "skip-link", href "#main-content" ] [ text t.skipToContent ]
 
 
 viewLiveRegion : String -> Html msg
@@ -717,44 +746,45 @@ viewLiveRegion announcement =
         [ text announcement ]
 
 
-viewHelpDialog : Html Msg
-viewHelpDialog =
+viewHelpDialog : I18n.Translations -> Html Msg
+viewHelpDialog t =
     div [ class "help-overlay", onClick ToggleHelpDialog ]
         [ div [ class "help-dialog" ]
             [ div [ class "help-header" ]
-                [ h2 [] [ text "Keyboard Shortcuts" ]
+                [ h2 [] [ text t.keyboardShortcuts ]
                 , button [ class "help-close", onClick ToggleHelpDialog ] [ text "×" ]
                 ]
             , div [ class "help-content" ]
                 [ div [ class "help-section" ]
-                    [ h3 [] [ text "Navigation" ]
-                    , viewShortcut "↑ / k" "Previous slide"
-                    , viewShortcut "↓ / j" "Next slide"
-                    , viewShortcut "g" "First slide"
-                    , viewShortcut "G" "Last slide"
+                    [ h3 [] [ text t.navigation ]
+                    , viewShortcut "↑ / k" t.previousSlide
+                    , viewShortcut "↓ / j" t.nextSlide
+                    , viewShortcut "g" t.firstSlide
+                    , viewShortcut "G" t.lastSlide
                     ]
                 , div [ class "help-section" ]
-                    [ h3 [] [ text "Slide Management" ]
-                    , viewShortcut "Ctrl+Shift+↑" "Move current slide up"
-                    , viewShortcut "Ctrl+Shift+↓" "Move current slide down"
+                    [ h3 [] [ text t.slideManagement ]
+                    , viewShortcut "Ctrl+Shift+↑" t.reorderSlideUp
+                    , viewShortcut "Ctrl+Shift+↓" t.reorderSlideDown
                     ]
                 , div [ class "help-section" ]
-                    [ h3 [] [ text "File Operations" ]
-                    , viewShortcut "Ctrl+I" "Upload image"
-                    , viewShortcut "Ctrl+O" "Import PPTX file"
+                    [ h3 [] [ text t.fileOperations ]
+                    , viewShortcut "Ctrl+I" t.uploadImageFile
+                    , viewShortcut "Ctrl+O" t.importFile
+                    , viewShortcut "Ctrl+S" t.exportFile
                     ]
                 , div [ class "help-section" ]
-                    [ h3 [] [ text "Presentation Mode" ]
-                    , viewShortcut "p" "Enter presentation mode"
-                    , viewShortcut "ESC" "Exit presentation mode"
-                    , viewShortcut "Space / Enter / →" "Next slide (in present mode)"
-                    , viewShortcut "← / h" "Previous slide (in present mode)"
-                    , viewShortcut "l" "Next slide (in present mode)"
+                    [ h3 [] [ text t.enterPresentation ]
+                    , viewShortcut "p" t.enterPresentation
+                    , viewShortcut "ESC" t.exitPresentation
+                    , viewShortcut "Space / Enter / →" (t.nextSlide ++ " (" ++ t.enterPresentation ++ ")")
+                    , viewShortcut "← / h" (t.previousSlide ++ " (" ++ t.enterPresentation ++ ")")
+                    , viewShortcut "l" (t.nextSlide ++ " (" ++ t.enterPresentation ++ ")")
                     ]
                 , div [ class "help-section" ]
-                    [ h3 [] [ text "Help" ]
-                    , viewShortcut "?" "Toggle this help dialog"
-                    , viewShortcut "ESC" "Close this help dialog"
+                    [ h3 [] [ text t.other ]
+                    , viewShortcut "?" t.showHelp
+                    , viewShortcut "ESC" t.close
                     ]
                 ]
             ]

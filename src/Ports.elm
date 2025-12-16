@@ -1,4 +1,4 @@
-port module Ports exposing (exportToPPTX, imagePasted, importPPTXRequested, loadFromLocalStorage, localStorageLoaded, pptxImported, saveToLocalStorage, setupImagePaste)
+port module Ports exposing (exportToPPTX, imagePasted, importPPTXRequested, languageLoaded, loadFromLocalStorage, loadLanguagePreference, localStorageLoaded, pptxImported, saveLanguagePreference, saveToLocalStorage, setupImagePaste)
 
 import Json.Encode as Encode
 
@@ -57,3 +57,24 @@ port importPPTXRequested : () -> Cmd msg
 
 
 port pptxImported : (String -> msg) -> Sub msg
+
+
+
+-- Outgoing port to save language preference to local storage
+
+
+port saveLanguagePreference : String -> Cmd msg
+
+
+
+-- Outgoing port to request loading language preference
+
+
+port loadLanguagePreference : () -> Cmd msg
+
+
+
+-- Incoming port to receive loaded language preference
+
+
+port languageLoaded : (String -> msg) -> Sub msg
