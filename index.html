@@ -796,11 +796,16 @@
                 image = await extractFirstImage(xmlDoc, relsXml, zip);
             }
             
-            // Determine layout
+            // Determine layout and content
             const layout = image ? 'markdown-with-image' : 'just-markdown';
             
+            // If no text content and no image, provide default
+            if (!content && !image) {
+                content = '# Empty Slide';
+            }
+            
             return {
-                content: content || '# Empty Slide',
+                content: content || '',
                 layout: layout,
                 image: image
             };
