@@ -4,14 +4,15 @@ import Browser
 import File exposing (File)
 import File.Download as Download
 import File.Select as Select
-import Html exposing (Html, button, div, text)
+import Html exposing (Html, div)
 import Html.Attributes exposing (class)
-import Html.Events exposing (onClick)
 import Json as AppJson
 import Json.Decode as Decode
 import Json.Encode as Encode
 import Task
-import Types exposing (Mode(..), Model, Msg(..), Presentation, Slide, SlideLayout(..), initialModel)
+import Types exposing (Mode(..), Model, Msg(..), Slide, SlideLayout(..), initialModel)
+import View.Edit exposing (viewEditMode)
+import View.Present exposing (viewPresentMode)
 
 
 
@@ -406,25 +407,4 @@ view model =
 
             Present ->
                 viewPresentMode model
-        ]
-
-
-viewEditMode : Model -> Html Msg
-viewEditMode model =
-    div [ class "edit-mode" ]
-        [ text "Edit Mode - Coming Soon"
-        , button [ onClick EnterPresentMode ] [ text "Present" ]
-        , button [ onClick AddSlide ] [ text "Add Slide" ]
-        , button [ onClick DownloadJSON ] [ text "Download JSON" ]
-        , button [ onClick LoadJSONRequested ] [ text "Load JSON" ]
-        ]
-
-
-viewPresentMode : Model -> Html Msg
-viewPresentMode model =
-    div [ class "present-mode" ]
-        [ text "Present Mode - Coming Soon"
-        , button [ onClick ExitPresentMode ] [ text "Exit" ]
-        , button [ onClick PrevSlide ] [ text "Previous" ]
-        , button [ onClick NextSlide ] [ text "Next" ]
         ]

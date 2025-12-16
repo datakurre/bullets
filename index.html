@@ -23,16 +23,303 @@
             overflow: hidden;
         }
 
-        .edit-mode, .present-mode {
+        /* Edit Mode Styles */
+        .edit-mode {
+            display: flex;
             width: 100%;
             height: 100%;
+        }
+
+        .sidebar {
+            width: 280px;
+            background-color: #e8e8e0;
+            border-right: 1px solid #d0d0c8;
             display: flex;
             flex-direction: column;
+        }
+
+        .sidebar-header {
+            padding: 1rem;
+            border-bottom: 1px solid #d0d0c8;
+            display: flex;
+            justify-content: space-between;
             align-items: center;
-            justify-content: center;
+        }
+
+        .sidebar-header h3 {
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        .btn-add {
+            width: 32px;
+            height: 32px;
+            font-size: 1.5rem;
+            padding: 0;
+            line-height: 1;
+        }
+
+        .slide-list {
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        .slide-item {
+            padding: 0.75rem 1rem;
+            border-bottom: 1px solid #d0d0c8;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .slide-item:hover {
+            background-color: #dcdcd0;
+        }
+
+        .slide-item.active {
+            background-color: #1a1a1a;
+            color: #f5f5f0;
+        }
+
+        .slide-item-content {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .slide-number {
+            font-weight: 600;
+            min-width: 2rem;
+        }
+
+        .slide-preview {
+            flex: 1;
+            font-size: 0.875rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .slide-item-actions {
+            display: flex;
+            gap: 0.25rem;
+        }
+
+        .btn-icon {
+            width: 28px;
+            height: 28px;
+            padding: 0;
+            font-size: 1rem;
+        }
+
+        .btn-danger {
+            background-color: #c44;
+        }
+
+        .btn-danger:hover {
+            background-color: #a33;
+        }
+
+        .sidebar-footer {
+            padding: 1rem;
+            border-top: 1px solid #d0d0c8;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .editor {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .editor-toolbar {
+            padding: 1rem;
+            background-color: #e8e8e0;
+            border-bottom: 1px solid #d0d0c8;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .layout-selector {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        select {
+            padding: 0.5rem;
+            border: 1px solid #d0d0c8;
+            border-radius: 4px;
+            background-color: #f5f5f0;
+            color: #1a1a1a;
+            cursor: pointer;
+        }
+
+        .editor-main {
+            flex: 1;
+            padding: 1rem;
+            overflow: hidden;
+        }
+
+        .editor-textarea {
+            width: 100%;
+            height: 100%;
+            padding: 1rem;
+            border: 1px solid #d0d0c8;
+            border-radius: 4px;
+            background-color: #fff;
+            color: #1a1a1a;
+            font-family: 'Monaco', 'Menlo', 'Consolas', monospace;
+            font-size: 0.9rem;
+            line-height: 1.6;
+            resize: none;
+        }
+
+        .editor-preview {
+            flex: 1;
+            padding: 1rem;
+            overflow-y: auto;
+            background-color: #fff;
+            border-left: 1px solid #d0d0c8;
+        }
+
+        .editor-preview pre {
+            white-space: pre-wrap;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            font-size: 1rem;
+            line-height: 1.6;
+        }
+
+        .preview-split {
+            display: flex;
             gap: 1rem;
         }
 
+        .preview-markdown {
+            flex: 1;
+        }
+
+        .preview-image {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .preview-image img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+
+        .image-placeholder {
+            color: #999;
+            font-style: italic;
+        }
+
+        /* Present Mode Styles */
+        .present-mode {
+            width: 100%;
+            height: 100%;
+            background-color: #f5f5f0;
+            position: relative;
+        }
+
+        .slide {
+            width: 100%;
+            height: 100%;
+            padding: 4rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .slide-title {
+            text-align: center;
+            width: 100%;
+        }
+
+        .title-content {
+            font-size: 3rem;
+            font-weight: 700;
+            line-height: 1.2;
+        }
+
+        .slide-markdown {
+            width: 100%;
+            max-width: 900px;
+        }
+
+        .markdown-content {
+            font-size: 1.5rem;
+            line-height: 1.6;
+            white-space: pre-wrap;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        }
+
+        .slide-split {
+            display: flex;
+            gap: 3rem;
+            width: 100%;
+            max-width: 1400px;
+        }
+
+        .slide-markdown-left {
+            flex: 1;
+        }
+
+        .slide-markdown-left .markdown-content {
+            font-size: 1.3rem;
+        }
+
+        .slide-image-right {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .slide-image {
+            max-width: 100%;
+            max-height: 70vh;
+            object-fit: contain;
+        }
+
+        .present-controls {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .btn-exit {
+            position: fixed;
+            top: 2rem;
+            right: 2rem;
+        }
+
+        .slide-counter {
+            font-size: 1rem;
+            color: #666;
+        }
+
+        .nav-buttons {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .btn-nav {
+            width: 48px;
+            height: 48px;
+            font-size: 1.5rem;
+        }
+
+        /* Button Styles */
         button {
             padding: 0.75rem 1.5rem;
             font-size: 1rem;
@@ -42,6 +329,7 @@
             border-radius: 4px;
             cursor: pointer;
             transition: background-color 0.2s;
+            font-family: inherit;
         }
 
         button:hover {
@@ -50,6 +338,29 @@
 
         button:active {
             background-color: #000;
+        }
+
+        button:disabled {
+            background-color: #999;
+            cursor: not-allowed;
+        }
+
+        /* Scrollbar Styles */
+        ::-webkit-scrollbar {
+            width: 10px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #e8e8e0;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #999;
+            border-radius: 5px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #666;
         }
     </style>
 </head>
