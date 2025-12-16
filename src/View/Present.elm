@@ -35,10 +35,13 @@ viewSlide slide =
         isOnlyTitle =
             isTitleOnly slide.content
         
+        isCoverStyle =
+            isCoverSlide slide.content
+        
         hasContent =
             not (String.isEmpty (String.trim slide.content))
     in
-    div [ class ("slide slide-" ++ layoutClass slide.layout ++ if isOnlyTitle then " slide-title-centered" else "") ]
+    div [ class ("slide slide-" ++ layoutClass slide.layout ++ if isOnlyTitle then " slide-title-centered" else if isCoverStyle then " slide-cover" else "") ]
         [ case slide.layout of
             JustMarkdown ->
                 div [ class (if isOnlyTitle then "slide-title" else "slide-markdown") ]
@@ -88,6 +91,25 @@ isTitleOnly content =
     case lines of
         [singleLine] ->
             String.startsWith "#" singleLine
+        
+        _ ->
+            False
+
+
+isCoverSlide : String -> Bool
+isCoverSlide content =
+    let
+        trimmed =
+            String.trim content
+        
+        lines =
+            String.lines trimmed
+                |> List.filter (\line -> not (String.isEmpty (String.trim line)))
+    in
+    case lines of
+        firstLine :: rest ->
+            -- Check if first line is a heading and there's more content
+            String.startsWith "#" firstLine && not (List.isEmpty rest)
         
         _ ->
             False
