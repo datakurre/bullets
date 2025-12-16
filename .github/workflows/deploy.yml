@@ -49,6 +49,12 @@ jobs:
         with:
           elm-version: 0.19.1
 
+      - name: Download vendor libraries
+        run: |
+          mkdir -p vendor
+          curl -L -s https://cdn.jsdelivr.net/npm/pptxgenjs@3.12.0/dist/pptxgen.bundle.js -o vendor/pptxgen.bundle.js
+          curl -L -s https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js -o vendor/jszip.min.js
+
       - name: Build
         run: |
           elm make src/Main.elm --optimize --output=elm.js
@@ -58,6 +64,7 @@ jobs:
           mkdir -p _site
           cp index.html _site/
           cp elm.js _site/
+          cp -r vendor _site/
 
       - name: Setup Pages
         uses: actions/configure-pages@v4

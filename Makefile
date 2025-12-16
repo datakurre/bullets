@@ -25,17 +25,21 @@ init:
 vendor:
 	@echo "Downloading vendor JavaScript libraries..."
 	@mkdir -p vendor
-	@echo "Downloading PptxGenJS..."
-	@curl -L -s https://cdn.jsdelivr.net/npm/pptxgenjs@3.12.0/dist/pptxgen.bundle.js -o vendor/pptxgen.bundle.js
-	@echo "Downloading JSZip..."
-	@curl -L -s https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js -o vendor/jszip.min.js
-	@echo "Vendor libraries downloaded!"
+	@if [ ! -f vendor/pptxgen.bundle.js ]; then \
+		echo "Downloading PptxGenJS..."; \
+		curl -L -s https://cdn.jsdelivr.net/npm/pptxgenjs@3.12.0/dist/pptxgen.bundle.js -o vendor/pptxgen.bundle.js; \
+	fi
+	@if [ ! -f vendor/jszip.min.js ]; then \
+		echo "Downloading JSZip..."; \
+		curl -L -s https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js -o vendor/jszip.min.js; \
+	fi
+	@echo "Vendor libraries ready!"
 
-watch:
+watch: vendor
 	@echo "Starting development server..."
 	elm-live src/Main.elm --open --start-page=index.html -- --output=elm.js
 
-build:
+build: vendor
 	@echo "Building optimized production bundle..."
 	elm make src/Main.elm --optimize --output=elm.js
 	@echo "Build complete: elm.js"
