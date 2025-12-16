@@ -8,16 +8,46 @@
 
 ## Implementation Status
 
-✅ **COMPLETED** - All core features have been implemented:
+✅ **COMPLETED** - All core features and vision items have been implemented:
 - Edit mode with slide management (add, delete, duplicate, reorder)
 - Three slide layouts (TitleOnly, JustMarkdown, MarkdownWithImage)
 - Presentation mode with keyboard navigation
-- Image paste support via clipboard
+- Image paste support via clipboard AND file upload
 - JSON import/export
 - Local storage autosave/autoload
-- Complete CSS styling
+- Complete CSS styling with clean black-on-off-white color scheme
+- Markdown rendering in both preview and presentation modes
+- VIM-style keybindings (j/k navigation, g/G, p for present)
+- GitHub Pages deployment workflow
 
-Latest commit: 80b9362 (Add autosave and autoload using browser local storage)
+Latest commits:
+- 31f43cf: Add VIM-style keybindings for navigation
+- 51ac2e0: Add GitHub Pages deployment workflow and README
+- 8b71985: Add image upload from filesystem
+- 19224dd: Add markdown rendering to preview and presentation mode
+- 80b9362: Add autosave and autoload using browser local storage
+
+## Current Features
+
+### Edit Mode
+- Sidebar with slide list and thumbnails
+- Add, delete, duplicate, and reorder slides
+- Three layout options: Title Only, Markdown, Markdown + Image
+- Live markdown preview
+- Image support: paste from clipboard or upload from filesystem
+- Auto-save to browser local storage
+- Export to JSON file
+- Import from JSON file
+- VIM-style navigation: j/k for next/prev slide, g/G for first/last, p for present
+
+### Presentation Mode
+- Full-screen clean display
+- Rendered markdown (not source)
+- Layout-specific rendering
+- Image display for split layouts
+- Multiple navigation options: arrows, space, enter, j/k/h/l
+- VIM-style shortcuts: g for first slide, G for last slide
+- ESC to exit
 
 ## Vision
 
@@ -42,15 +72,15 @@ Enter dev environment: `nix develop`
 
 ## Build System
 
-The project will use a Makefile with these targets:
+The project uses a Makefile with these targets:
 - `make init` - Initialize project dependencies
-- `make watch` - Development mode with auto-reload
-- `make build` - Production build
+- `make watch` - Development mode with auto-reload (uses elm-live)
+- `make build` - Production build with optimization
 - `make test` - Run test suite
-- `make format` - Format all source files
+- `make format` - Format all source files with elm-format
 - `make clean` - Remove build artifacts
 
-## Architecture (Planned)
+## Architecture
 
 ### Data Model
 
@@ -78,16 +108,22 @@ The project will use a Makefile with these targets:
 
 - Navigation: NextSlide, PrevSlide, GoToSlide Int
 - Mode switching: EnterPresentMode, ExitPresentMode
-- Slide management: AddSlide, DeleteSlide, DuplicateSlide, ReorderSlide
+- Slide management: AddSlide, DeleteSlide Int, DuplicateSlide Int, MoveSlideUp Int, MoveSlideDown Int
 - Content editing: UpdateContent String, ChangeLayout SlideLayout
-- Image handling: ImagePasted String, RemoveImage
-- File operations: DownloadJSON, LoadJSON, FileSelected File
+- Image handling: ImagePasted String, ImageUploadRequested, ImageFileSelected File, ImageFileLoaded String, RemoveImage
+- File operations: DownloadJSON, LoadJSONRequested, FileSelected File, FileLoaded String
+- Keyboard: KeyPressed String
+- Storage: LocalStorageLoaded String
 
 ### View Organization
 
 - Edit mode: Sidebar (slide list) + Main (editor + preview)
+  - View.Edit module handles all edit mode UI
+  - Markdown preview with live rendering
 - Present mode: Full-screen slide renderer
-- Shared: Markdown renderer component
+  - View.Present module handles presentation UI
+  - Rendered markdown with layout-specific display
+- Shared: MarkdownView module provides markdown rendering helper
 
 ## Development Workflow
 
@@ -115,18 +151,16 @@ The project will use a Makefile with these targets:
 - Cross-browser testing before major releases
 - Focus on data integrity (JSON round-trip correctness)
 
-## Dependencies (Planned)
+## Dependencies
 
 Core:
 - elm/browser - Application framework
 - elm/json - JSON encoding/decoding
 - elm/html - View rendering
+- elm/file - File upload/download
 
 Markdown:
-- dillonkearns/elm-markdown or pablohirafuji/elm-markdown
-
-File handling:
-- elm/file - File upload/download
+- dillonkearns/elm-markdown - Markdown parsing and rendering with custom renderer support
 
 ## Notes for LLM Agents
 
