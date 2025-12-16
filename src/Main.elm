@@ -2,12 +2,8 @@ module Main exposing (main)
 
 import Browser
 import Browser.Events
-import File
-import File.Download as Download
-import File.Select as Select
 import Html exposing (Html, a, div, text)
 import Html.Attributes exposing (class, href)
-import Html.Events exposing (custom, onClick, onInput)
 import I18n
 import Json.Decode as Decode
 import Ports
