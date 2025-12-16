@@ -6,6 +6,19 @@
 - **Edit Mode**: Create and manage slides with markdown content
 - **Presentation Mode**: Display slides in full-screen
 
+## Implementation Status
+
+✅ **COMPLETED** - All core features have been implemented:
+- Edit mode with slide management (add, delete, duplicate, reorder)
+- Three slide layouts (TitleOnly, JustMarkdown, MarkdownWithImage)
+- Presentation mode with keyboard navigation
+- Image paste support via clipboard
+- JSON import/export
+- Local storage autosave/autoload
+- Complete CSS styling
+
+Latest commit: 80b9362 (Add autosave and autoload using browser local storage)
+
 ## Vision
 
 A minimal, elegant presentation tool that:
