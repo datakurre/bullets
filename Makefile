@@ -35,7 +35,9 @@ test:
 format:
 	@echo "Formatting Elm source files..."
 	elm-format --yes src/
-	elm-format --yes tests/
+	@if [ -n "$$(find tests -name '*.elm' 2>/dev/null)" ]; then \
+		elm-format --yes tests/; \
+	fi
 
 clean:
 	@echo "Cleaning build artifacts..."
