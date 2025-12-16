@@ -801,6 +801,24 @@
             const lines = slide.content.split('\n');
             let yPos = 0.5; // Start position in inches
             
+            // Check if slide has meaningful content (not just empty lines)
+            const hasContent = lines.some(function(line) {
+                return line.trim().length > 0;
+            });
+            
+            // If there's an image but no content, show full-screen image
+            if (slide.image && !hasContent) {
+                pptxSlide.addImage({
+                    data: slide.image,
+                    x: 0.5,
+                    y: 0.5,
+                    w: 9,
+                    h: 5,
+                    sizing: { type: 'contain', w: 9, h: 5 }
+                });
+                return;
+            }
+            
             // If there's an image, split the slide in half
             if (slide.image) {
                 // Left side: markdown content
