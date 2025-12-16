@@ -1,4 +1,4 @@
-port module Ports exposing (imagePasted, setupImagePaste)
+port module Ports exposing (imagePasted, loadFromLocalStorage, localStorageLoaded, saveToLocalStorage, setupImagePaste)
 
 -- Outgoing port to tell JavaScript to setup image paste listener
 
@@ -11,3 +11,24 @@ port setupImagePaste : () -> Cmd msg
 
 
 port imagePasted : (String -> msg) -> Sub msg
+
+
+
+-- Outgoing port to save presentation to local storage
+
+
+port saveToLocalStorage : String -> Cmd msg
+
+
+
+-- Outgoing port to request loading from local storage
+
+
+port loadFromLocalStorage : () -> Cmd msg
+
+
+
+-- Incoming port to receive loaded presentation from local storage
+
+
+port localStorageLoaded : (String -> msg) -> Sub msg

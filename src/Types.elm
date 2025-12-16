@@ -69,6 +69,7 @@ type Msg
     | FileSelected File
     | FileLoaded String
     | KeyPressed String
+    | LocalStorageLoaded String
 
 
 

@@ -390,6 +390,27 @@
                 }
             });
         });
+
+        // Local storage support
+        var STORAGE_KEY = 'bullets-presentation';
+
+        app.ports.saveToLocalStorage.subscribe(function(data) {
+            try {
+                localStorage.setItem(STORAGE_KEY, data);
+            } catch (e) {
+                console.error('Failed to save to local storage:', e);
+            }
+        });
+
+        app.ports.loadFromLocalStorage.subscribe(function() {
+            try {
+                var data = localStorage.getItem(STORAGE_KEY);
+                app.ports.localStorageLoaded.send(data || '');
+            } catch (e) {
+                console.error('Failed to load from local storage:', e);
+                app.ports.localStorageLoaded.send('');
+            }
+        });
     </script>
 </body>
 </html>

@@ -12,7 +12,7 @@ import Json.Decode as Decode
 import Json.Encode as Encode
 import Ports
 import Task
-import Types exposing (Mode(..), Model, Msg(..), Slide, SlideLayout(..), initialModel)
+import Types exposing (Mode(..), Model, Msg(..), Presentation, Slide, SlideLayout(..), initialModel)
 import View.Edit exposing (viewEditMode)
 import View.Present exposing (viewPresentMode)
 
@@ -37,7 +37,12 @@ main =
 
 init : () -> ( Model, Cmd Msg )
 init _ =
-    ( initialModel, Ports.setupImagePaste () )
+    ( initialModel
+    , Cmd.batch
+        [ Ports.setupImagePaste ()
+        , Ports.loadFromLocalStorage ()
+        ]
+    )
 
 
 
@@ -95,7 +100,7 @@ update msg model =
                 , currentSlideIndex = newIndex
                 , editingContent = newSlide.content
               }
-            , Cmd.none
+            , savePresentation updatedPresentation
             )
 
         DeleteSlide index ->
@@ -123,7 +128,7 @@ update msg model =
                     | presentation = updatedPresentation
                     , currentSlideIndex = newIndex
                   }
-                , Cmd.none
+                , savePresentation updatedPresentation
                 )
 
         DuplicateSlide index ->
@@ -153,7 +158,7 @@ update msg model =
                 updatedPresentation =
                     { presentation | slides = updatedSlides }
             in
-            ( { model | presentation = updatedPresentation }, Cmd.none )
+            ( { model | presentation = updatedPresentation }, savePresentation updatedPresentation )
 
         MoveSlideUp index ->
             if index <= 0 then
@@ -184,7 +189,7 @@ update msg model =
                     | presentation = updatedPresentation
                     , currentSlideIndex = newIndex
                   }
-                , Cmd.none
+                , savePresentation updatedPresentation
                 )
 
         MoveSlideDown index ->
@@ -220,7 +225,7 @@ update msg model =
                     | presentation = updatedPresentation
                     , currentSlideIndex = newIndex
                   }
-                , Cmd.none
+                , savePresentation updatedPresentation
                 )
 
         UpdateContent content ->
@@ -246,7 +251,7 @@ update msg model =
                 | editingContent = content
                 , presentation = updatedPresentation
               }
-            , Cmd.none
+            , savePresentation updatedPresentation
             )
 
         ChangeLayout layout ->
@@ -268,7 +273,7 @@ update msg model =
                 updatedPresentation =
                     { presentation | slides = updatedSlides }
             in
-            ( { model | presentation = updatedPresentation }, Cmd.none )
+            ( { model | presentation = updatedPresentation }, savePresentation updatedPresentation )
 
         ImagePasted dataUri ->
             let
@@ -289,7 +294,7 @@ update msg model =
                 updatedPresentation =
                     { presentation | slides = updatedSlides }
             in
-            ( { model | presentation = updatedPresentation }, Cmd.none )
+            ( { model | presentation = updatedPresentation }, savePresentation updatedPresentation )
 
         RemoveImage ->
             let
@@ -310,7 +315,7 @@ update msg model =
                 updatedPresentation =
                     { presentation | slides = updatedSlides }
             in
-            ( { model | presentation = updatedPresentation }, Cmd.none )
+            ( { model | presentation = updatedPresentation }, savePresentation updatedPresentation )
 
         DownloadJSON ->
             let
@@ -376,6 +381,42 @@ update msg model =
                 Edit ->
                     ( model, Cmd.none )
 
+        LocalStorageLoaded content ->
+            if String.isEmpty content then
+                ( model, Cmd.none )
+
+            else
+                case Decode.decodeString AppJson.decodePresentation content of
+                    Ok presentation ->
+                        let
+                            firstSlideContent =
+                                List.head presentation.slides
+                                    |> Maybe.map .content
+                                    |> Maybe.withDefault ""
+                        in
+                        ( { model
+                            | presentation = presentation
+                            , currentSlideIndex = 0
+                            , editingContent = firstSlideContent
+                          }
+                        , Cmd.none
+                        )
+
+                    Err _ ->
+                        ( model, Cmd.none )
+
+
+savePresentation : Presentation -> Cmd Msg
+savePresentation presentation =
+    let
+        json =
+            AppJson.encodePresentation presentation
+
+        jsonString =
+            Encode.encode 0 json
+    in
+    Ports.saveToLocalStorage jsonString
+
 
 swapSlides : Int -> Int -> List Slide -> List Slide
 swapSlides i j slides =
@@ -426,6 +467,7 @@ subscriptions model =
             Edit ->
                 Sub.none
         , Ports.imagePasted ImagePasted
+        , Ports.localStorageLoaded LocalStorageLoaded
         ]
 
 
