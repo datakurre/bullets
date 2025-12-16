@@ -5,6 +5,9 @@ elm.js
 # Vendor libraries
 vendor/
 
+# Test coverage
+coverage/
+
 # Agents
 TODO*
 
