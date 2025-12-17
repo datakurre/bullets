@@ -1,7 +1,7 @@
 module View.Edit exposing (viewEditMode)
 
-import Html exposing (Html, aside, button, div, h3, img, input, label, main_, nav, span, text, textarea)
-import Html.Attributes exposing (attribute, checked, class, draggable, for, id, name, placeholder, src, type_, value)
+import Html exposing (Html, aside, button, div, img, input, label, main_, nav, span, text, textarea)
+import Html.Attributes exposing (attribute, checked, class, draggable, id, name, placeholder, src, type_, value)
 import Html.Events exposing (on, onBlur, onClick, onFocus, onInput, preventDefaultOn)
 import I18n
 import Json.Decode as Decode
