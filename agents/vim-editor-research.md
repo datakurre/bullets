@@ -1,7 +1,10 @@
 # VIM-Capable Editor Research for Bullets
 
-**Date:** 2025-12-16
+**Type:** Research Document  
+**Date:** 2024-12-16
 **Status:** Research Complete
+
+> **Note:** This document contains research for a potential future feature. The decision was to keep the current textarea implementation (see ADR 001). This document is kept for reference if advanced VIM text editing is needed in the future.
 
 ## Objective
 
