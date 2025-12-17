@@ -1,4 +1,4 @@
-module Update.Keyboard exposing (handleEditModeKey, handlePresentModeKey, keyPressed)
+module Update.Keyboard exposing (keyPressed)
 
 {-| Update handlers for keyboard input.
 
@@ -8,7 +8,7 @@ modifier keys, and context-aware behavior.
 -}
 
 import I18n
-import Types exposing (Mode(..), Model, Msg(..))
+import Types exposing (Mode(..), Model)
 import Update.FileIO
 import Update.Image
 import Update.Mode
