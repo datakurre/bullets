@@ -2,7 +2,7 @@
 
 **Purpose**: Comprehensive guide to testing strategy, test organization, and quality assurance for the bullets presentation tool.
 
-**Last Updated**: 2024-12-16
+**Last Updated**: 2024-12-17
 
 ## Overview
 
@@ -28,7 +28,7 @@ The bullets project follows a **Test-Driven Development (TDD)** approach for bus
 
 ### Current Status
 
-- **72 unit tests** covering core functionality
+- **146 unit tests** covering core functionality
 - **All tests passing** in CI/CD pipeline
 - Focus areas:
   - JSON serialization/deserialization (round-trip correctness)
@@ -76,9 +76,19 @@ The bullets project follows a **Test-Driven Development (TDD)** approach for bus
 
 ```
 tests/
+├── AccessibilityTest.elm     # Accessibility tests (ARIA, keyboard nav, etc.)
 ├── JsonTest.elm              # JSON encoding/decoding tests
 ├── NavigationTest.elm        # Navigation logic tests
-└── SlideManipulationTest.elm # Slide manipulation tests
+├── SlideManipulationTest.elm # Slide manipulation tests
+└── Update/                   # Update function tests organized by module
+    ├── ContentTest.elm       # Content update tests
+    ├── FileIOTest.elm        # File I/O tests (PPTX import/export)
+    ├── ImageTest.elm         # Image handling tests
+    ├── ModeTest.elm          # Mode switching tests
+    ├── NavigationTest.elm    # Navigation update tests
+    ├── SlideTest.elm         # Slide update tests
+    ├── StorageTest.elm       # Local storage tests
+    └── UITest.elm            # UI state tests
 ```
 
 ### File Naming Convention
@@ -133,6 +143,17 @@ Bad examples:
 - ❌ "navigation"
 
 ## Test Suites
+
+### AccessibilityTest.elm
+
+Tests accessibility features including ARIA labels, keyboard navigation, and screen reader support.
+
+**Focus areas**:
+- ARIA role and label presence
+- Keyboard navigation support
+- Focus management
+- Screen reader announcements
+- Help dialog accessibility
 
 ### JsonTest.elm
 
@@ -192,6 +213,34 @@ Tests slide management operations.
 - Cannot move beyond bounds
 - Deleting current slide adjusts currentIndex
 
+### Update Module Tests
+
+Tests for the Update module and its submodules, organized by functionality.
+
+#### Update/ContentTest.elm
+Tests content update logic.
+
+#### Update/FileIOTest.elm
+Tests PPTX import/export functionality.
+
+#### Update/ImageTest.elm
+Tests image handling (clipboard paste, file upload).
+
+#### Update/ModeTest.elm
+Tests mode switching between edit and presentation modes.
+
+#### Update/NavigationTest.elm
+Tests navigation update logic.
+
+#### Update/SlideTest.elm
+Tests slide update operations.
+
+#### Update/StorageTest.elm
+Tests local storage save/load functionality.
+
+#### Update/UITest.elm
+Tests UI state management (drag/drop, help dialog).
+
 ## Running Tests
 
 ### Command Line
@@ -222,8 +271,8 @@ Successful run:
 ```
 TEST RUN PASSED
 
-Duration: 123 ms
-Passed:   72
+Duration: 150 ms
+Passed:   146
 Failed:   0
 ```
 
@@ -232,7 +281,7 @@ Failed test:
 TEST RUN FAILED
 
 Duration: 145 ms
-Passed:   71
+Passed:   145
 Failed:   1
 
 ↓ Navigation
@@ -274,9 +323,9 @@ The HTML report includes:
 ### Coverage Metrics
 
 Currently tracking:
-- **Total tests**: 72
+- **Total tests**: 146
 - **Pass rate**: 100%
-- **Test execution time**: ~3-5 seconds
+- **Test execution time**: ~150ms
 
 Note: Elm doesn't have built-in code coverage tools like other languages. The "coverage" report shows test results, not line coverage.
 
