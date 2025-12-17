@@ -10,67 +10,79 @@ suite : Test
 suite =
     describe "Update.Storage"
         [ describe "localStorageLoaded"
-            [ test "ignores empty content" <|
-                \_ ->
-                    let
-                        model =
-                            initialModel
+            [ describe "given empty content"
+                [ describe "when loading from local storage"
+                    [ test "should not modify the model" <|
+                        \_ ->
+                            let
+                                model =
+                                    initialModel
 
-                        ( newModel, _ ) =
-                            Update.Storage.localStorageLoaded "" model
-                    in
-                    Expect.equal model newModel
-            , test "loads valid presentation JSON" <|
-                \_ ->
-                    let
-                        model =
-                            initialModel
+                                ( newModel, _ ) =
+                                    Update.Storage.localStorageLoaded "" model
+                            in
+                            Expect.equal model newModel
+                    ]
+                ]
+            , describe "given valid presentation JSON"
+                [ describe "when loading from local storage"
+                    [ test "should load the presentation data" <|
+                        \_ ->
+                            let
+                                model =
+                                    initialModel
 
-                        json =
-                            """{"title":"Loaded Title","author":"Test Author","created":"2025-01-01","slides":[{"content":"# Loaded","image":null}]}"""
+                                json =
+                                    """{"title":"Loaded Title","author":"Test Author","created":"2025-01-01","slides":[{"content":"# Loaded","image":null}]}"""
 
-                        ( newModel, _ ) =
-                            Update.Storage.localStorageLoaded json model
-                    in
-                    Expect.equal "Loaded Title" newModel.presentation.title
-            , test "sets currentSlideIndex to 0" <|
-                \_ ->
-                    let
-                        model =
-                            { initialModel | currentSlideIndex = 5 }
+                                ( newModel, _ ) =
+                                    Update.Storage.localStorageLoaded json model
+                            in
+                            Expect.equal "Loaded Title" newModel.presentation.title
+                    , test "should reset currentSlideIndex to the first slide" <|
+                        \_ ->
+                            let
+                                model =
+                                    { initialModel | currentSlideIndex = 5 }
 
-                        json =
-                            """{"title":"Test","author":"Test","created":"2025-01-01","slides":[{"content":"# Test","image":null}]}"""
+                                json =
+                                    """{"title":"Test","author":"Test","created":"2025-01-01","slides":[{"content":"# Test","image":null}]}"""
 
-                        ( newModel, _ ) =
-                            Update.Storage.localStorageLoaded json model
-                    in
-                    Expect.equal 0 newModel.currentSlideIndex
-            , test "sets editingContent from first slide" <|
-                \_ ->
-                    let
-                        model =
-                            initialModel
+                                ( newModel, _ ) =
+                                    Update.Storage.localStorageLoaded json model
+                            in
+                            Expect.equal 0 newModel.currentSlideIndex
+                    , test "should set editingContent from the first slide" <|
+                        \_ ->
+                            let
+                                model =
+                                    initialModel
 
-                        json =
-                            """{"title":"Test","author":"Test","created":"2025-01-01","slides":[{"content":"# First Slide","image":null}]}"""
+                                json =
+                                    """{"title":"Test","author":"Test","created":"2025-01-01","slides":[{"content":"# First Slide","image":null}]}"""
 
-                        ( newModel, _ ) =
-                            Update.Storage.localStorageLoaded json model
-                    in
-                    Expect.equal "# First Slide" newModel.editingContent
-            , test "ignores invalid JSON" <|
-                \_ ->
-                    let
-                        model =
-                            initialModel
+                                ( newModel, _ ) =
+                                    Update.Storage.localStorageLoaded json model
+                            in
+                            Expect.equal "# First Slide" newModel.editingContent
+                    ]
+                ]
+            , describe "given invalid JSON"
+                [ describe "when attempting to load from local storage"
+                    [ test "should not modify the model" <|
+                        \_ ->
+                            let
+                                model =
+                                    initialModel
 
-                        invalidJson =
-                            "not valid json"
+                                invalidJson =
+                                    "not valid json"
 
-                        ( newModel, _ ) =
-                            Update.Storage.localStorageLoaded invalidJson model
-                    in
-                    Expect.equal model newModel
+                                ( newModel, _ ) =
+                                    Update.Storage.localStorageLoaded invalidJson model
+                            in
+                            Expect.equal model newModel
+                    ]
+                ]
             ]
         ]
