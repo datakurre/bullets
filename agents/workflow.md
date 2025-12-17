@@ -2,7 +2,7 @@
 
 **Purpose**: Guide to development workflow, contribution process, and best practices for the bullets presentation tool.
 
-**Last Updated**: 2024-12-16
+**Last Updated**: 2024-12-17
 
 ## Overview
 
