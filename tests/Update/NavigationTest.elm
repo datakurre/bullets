@@ -3,7 +3,7 @@ module Update.NavigationTest exposing (suite)
 import Expect
 import I18n exposing (Language(..))
 import Test exposing (Test, describe, test)
-import Types exposing (Mode(..), Model, Msg(..), Presentation, Slide, initialModel)
+import Types exposing (Mode(..), Model, Msg(..), Slide, initialModel)
 import Update.Navigation
 
 

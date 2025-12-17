@@ -2,7 +2,7 @@ module Update.ContentTest exposing (suite)
 
 import Expect
 import Test exposing (Test, describe, test)
-import Types exposing (Presentation, Slide, initialModel)
+import Types exposing (Slide, initialModel)
 import Update.Content
 
 

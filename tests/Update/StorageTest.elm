@@ -2,7 +2,7 @@ module Update.StorageTest exposing (suite)
 
 import Expect
 import Test exposing (Test, describe, test)
-import Types exposing (Slide, initialModel)
+import Types exposing (initialModel)
 import Update.Storage
 
 

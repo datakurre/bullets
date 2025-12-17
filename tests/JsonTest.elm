@@ -4,7 +4,6 @@ import Expect
 import Json exposing (decodePresentation, encodePresentation)
 import Json.Decode as Decode
 import Test exposing (..)
-import Types exposing (Slide)
 
 
 suite : Test
