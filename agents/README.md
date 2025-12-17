@@ -26,6 +26,11 @@ The `./agents/` directory provides modular, focused documentation that supplemen
 - **[adr/](./adr/)** - Architecture Decision Records documenting key design choices
   - [001: VIM Keybindings](./adr/001-vim-keybindings.md)
 
+### Historical Documents
+
+- **[main-refactoring-plan.md](./main-refactoring-plan.md)** - Completed Main.elm refactoring plan (historical reference)
+- **[vim-editor-research.md](./vim-editor-research.md)** - VIM editor research (decision: kept textarea with VIM navigation)
+
 ## How to Use
 
 When working on the bullets project:
@@ -66,5 +71,5 @@ Update this README when:
 - File purposes change
 - Cross-reference patterns evolve
 
-Last Updated: 2024-12-16
+Last Updated: 2025-12-17
 
