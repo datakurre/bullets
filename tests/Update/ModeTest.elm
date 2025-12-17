@@ -11,53 +11,61 @@ suite : Test
 suite =
     describe "Update.Mode"
         [ describe "enterPresentMode"
-            [ test "switches mode to Present" <|
-                \_ ->
-                    let
-                        model =
-                            { initialModel | mode = Edit }
+            [ describe "given the application is in edit mode"
+                [ describe "when entering presentation mode"
+                    [ test "should switch to presentation mode" <|
+                        \_ ->
+                            let
+                                model =
+                                    { initialModel | mode = Edit }
 
-                        ( newModel, _ ) =
-                            Update.Mode.enterPresentMode model
-                    in
-                    Expect.equal Present newModel.mode
-            , test "sets announcement for entering presentation mode" <|
-                \_ ->
-                    let
-                        model =
-                            { initialModel | mode = Edit }
+                                ( newModel, _ ) =
+                                    Update.Mode.enterPresentMode model
+                            in
+                            Expect.equal Present newModel.mode
+                    , test "should announce the mode change" <|
+                        \_ ->
+                            let
+                                model =
+                                    { initialModel | mode = Edit }
 
-                        ( newModel, _ ) =
-                            Update.Mode.enterPresentMode model
+                                ( newModel, _ ) =
+                                    Update.Mode.enterPresentMode model
 
-                        t =
-                            I18n.translations model.language
-                    in
-                    Expect.equal t.enteringPresentMode newModel.announcement
+                                t =
+                                    I18n.translations model.language
+                            in
+                            Expect.equal t.enteringPresentMode newModel.announcement
+                    ]
+                ]
             ]
         , describe "exitPresentMode"
-            [ test "switches mode to Edit" <|
-                \_ ->
-                    let
-                        model =
-                            { initialModel | mode = Present }
+            [ describe "given the application is in presentation mode"
+                [ describe "when exiting presentation mode"
+                    [ test "should switch to edit mode" <|
+                        \_ ->
+                            let
+                                model =
+                                    { initialModel | mode = Present }
 
-                        ( newModel, _ ) =
-                            Update.Mode.exitPresentMode model
-                    in
-                    Expect.equal Edit newModel.mode
-            , test "sets announcement for exiting presentation mode" <|
-                \_ ->
-                    let
-                        model =
-                            { initialModel | mode = Present }
+                                ( newModel, _ ) =
+                                    Update.Mode.exitPresentMode model
+                            in
+                            Expect.equal Edit newModel.mode
+                    , test "should announce the mode change" <|
+                        \_ ->
+                            let
+                                model =
+                                    { initialModel | mode = Present }
 
-                        ( newModel, _ ) =
-                            Update.Mode.exitPresentMode model
+                                ( newModel, _ ) =
+                                    Update.Mode.exitPresentMode model
 
-                        t =
-                            I18n.translations model.language
-                    in
-                    Expect.equal t.exitingPresentMode newModel.announcement
+                                t =
+                                    I18n.translations model.language
+                            in
+                            Expect.equal t.exitingPresentMode newModel.announcement
+                    ]
+                ]
             ]
         ]
