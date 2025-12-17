@@ -2,7 +2,7 @@
 
 **Purpose**: Complete guide to the development environment setup, build system, and tooling for the bullets presentation tool.
 
-**Last Updated**: 2024-12-16
+**Last Updated**: 2025-12-17
 
 ## Overview
 
@@ -134,7 +134,7 @@ Runs the unit test suite:
 - Reports pass/fail with details
 - Exits with non-zero code on failure (CI-friendly)
 
-**Current status**: 72 unit tests passing
+**Current status**: 146 unit tests passing
 
 **Usage**:
 ```bash
