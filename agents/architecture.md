@@ -2,7 +2,7 @@
 
 **Purpose**: Core architecture patterns, data model, message flow, and view organization for the bullets presentation tool
 
-**Last Updated**: 2024-12-16 (commit 504cfe4)
+**Last Updated**: 2025-12-17 (commit 494f4b4)
 
 ## Overview
 
@@ -22,16 +22,29 @@ The application follows the standard Elm Architecture:
 
 ```
 src/
-├── Main.elm              # Application entry, init, update, subscriptions
+├── Main.elm              # Application entry, init, subscriptions
 ├── Types.elm             # All type definitions and Model
 ├── Ports.elm             # JavaScript interop ports
 ├── Json.elm              # JSON encoders/decoders for persistence
 ├── Navigation.elm        # Slide navigation logic
 ├── SlideManipulation.elm # Slide operations (add, delete, move, etc.)
 ├── MarkdownView.elm      # Markdown rendering helper
+├── I18n.elm              # Internationalization (translations)
+├── Update.elm            # Main update coordinator
+├── Update/               # Modular update sub-modules
+│   ├── Content.elm       # Content editing logic
+│   ├── FileIO.elm        # PowerPoint import/export
+│   ├── Image.elm         # Image handling logic
+│   ├── Keyboard.elm      # Keyboard event routing
+│   ├── Mode.elm          # Mode switching logic
+│   ├── Navigation.elm    # Navigation updates
+│   ├── Slide.elm         # Slide manipulation updates
+│   ├── Storage.elm       # Local storage operations
+│   └── UI.elm            # UI state (help dialog, language)
 └── View/
     ├── Edit.elm          # Edit mode view
-    └── Present.elm       # Presentation mode view
+    ├── Present.elm       # Presentation mode view
+    └── HelpDialog.elm    # Help dialog component
 ```
 
 ### Port-Based JavaScript Interop
@@ -40,6 +53,30 @@ The application uses Elm ports for JavaScript interop:
 - **localStorage** - Save/load presentations
 - **image handling** - Paste and upload images as data URIs
 - **PPTX import/export** - PowerPoint file conversion using JSZip and PptxGenJS
+
+### Modular Update Architecture
+
+The update logic is organized into specialized modules for maintainability:
+
+**Update.elm**: Main coordinator that routes messages to appropriate sub-modules
+
+**Sub-modules** (single responsibility principle):
+- **Update.Navigation**: Slide navigation (NextSlide, PrevSlide, GoToSlide, FirstSlide, LastSlide)
+- **Update.Mode**: Mode switching (EnterPresentMode, ExitPresentMode)
+- **Update.Content**: Content editing (UpdateContent, UpdateTitle)
+- **Update.Storage**: Local storage operations (LocalStorageLoaded, LanguageLoaded)
+- **Update.Image**: Image handling (paste, upload, load, remove)
+- **Update.Slide**: Slide manipulation (add, delete, duplicate, move, drag-drop)
+- **Update.FileIO**: PowerPoint import/export (ExportToPPTX, ImportPPTXRequested, PPTXImported)
+- **Update.UI**: UI state (help dialog, language, textarea focus)
+- **Update.Keyboard**: Keyboard event routing (KeyPressed, delegates to other modules)
+
+**Benefits**:
+- Each module has single, clear responsibility
+- 146 unit tests covering all update logic
+- Easy to locate specific functionality
+- Adding new features doesn't bloat Main.elm
+- Main.elm reduced from 810 lines to 124 lines (85% reduction)
 
 ## Data Model
 
@@ -79,6 +116,8 @@ type alias Model =
     , editingContent : String        -- Buffer for current edits
     , draggedSlideIndex : Maybe Int  -- For drag and drop
     , dropTargetIndex : Maybe Int    -- Visual placeholder during drag
+    , language : Language            -- UI language (English | Finnish)
+    , showHelpDialog : Bool          -- Help dialog visibility
     }
 ```
 
@@ -120,6 +159,7 @@ No manual layout selection is needed - the layout is inferred from the data.
 
 ### Content Editing
 - `UpdateContent String` - Update current slide content
+- `UpdateTitle String` - Update presentation title
 
 ### Image Handling
 - `ImagePasted String` - Image pasted from clipboard (data URI)
@@ -135,10 +175,17 @@ No manual layout selection is needed - the layout is inferred from the data.
 - `ExportToPPTX` - Export to PowerPoint format
 
 ### Keyboard Input
-- `KeyPressed String` - Handle keyboard shortcuts
+- `KeyPressed String Bool Bool` - Handle keyboard shortcuts (key, ctrl, shift)
 
 ### Storage
 - `LocalStorageLoaded String` - Presentation loaded from localStorage
+- `LanguageLoaded String` - UI language loaded from localStorage
+
+### UI State
+- `ToggleHelpDialog` - Show/hide help dialog
+- `ChangeLanguage Language` - Change UI language
+- `TextareaFocused` - Textarea received focus
+- `TextareaBlurred` - Textarea lost focus
 
 ## View Organization
 
@@ -272,6 +319,21 @@ Features:
 - Keyboard-first workflow
 - Familiar patterns for developers
 - Consistent with terminal habits
+
+### Internationalization (i18n)
+- Type-safe translation system via I18n module
+- Language union type (English | Finnish) for compile-time safety
+- Language preference persisted to localStorage
+- Easy to add new languages
+- All UI text translated, not user content
+
+### Accessibility (WCAG 2.1 AA)
+- Full keyboard navigation support
+- ARIA labels and semantic HTML
+- Screen reader announcements for state changes
+- Help dialog with all keyboard shortcuts
+- Visible focus indicators
+- High contrast theme
 
 ## State Management
 
