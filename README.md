@@ -68,4 +68,4 @@ The site will be available at: `https://<username>.github.io/<repository>/`
 
 ## License
 
-BSD-3-Clause
+MIT

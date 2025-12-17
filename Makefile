@@ -1,4 +1,4 @@
-.PHONY: init watch build test format clean help vendor coverage
+.PHONY: init watch build test format clean help vendor coverage review
 
 help:
 	@echo "bullets - Elm presentation tool"
@@ -11,6 +11,7 @@ help:
 	@echo "  make test     - Run test suite"
 	@echo "  make coverage - Run test suite with detailed output"
 	@echo "  make format   - Format all Elm source files"
+	@echo "  make review   - Run elm-review for code quality checks"
 	@echo "  make clean    - Remove build artifacts"
 
 init:
@@ -79,6 +80,10 @@ format:
 	@if [ -n "$$(find tests -name '*.elm' 2>/dev/null)" ]; then \
 		elm-format --yes tests/; \
 	fi
+
+review:
+	@echo "Running elm-review..."
+	elm-review
 
 clean:
 	@echo "Cleaning build artifacts..."
