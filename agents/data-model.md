@@ -2,7 +2,7 @@
 
 **Purpose**: Detailed documentation of all types, data structures, JSON encoding/decoding, and data transformation logic for the bullets presentation tool
 
-**Last Updated**: 2024-12-16 (commit 8a35bf9)
+**Last Updated**: 2025-12-17 (commit ad2516b)
 
 ## Overview
 
@@ -98,6 +98,24 @@ type Mode
 - Edit → Present: Via "Present" button or `p` key
 - Present → Edit: Via ESC key or exit command
 
+### Language
+
+UI language enumeration.
+
+```elm
+type Language
+    = English   -- English UI (default)
+    | Finnish   -- Finnish UI
+```
+
+**Purpose:** Internationalization support for UI text (not slide content)
+
+**Characteristics:**
+- Compile-time safety (no invalid language codes)
+- Persisted to localStorage separately from presentation
+- Easy to extend with new languages
+- Default: English
+
 ### Model
 
 Complete application state.
@@ -112,6 +130,7 @@ type alias Model =
     , dropTargetIndex : Maybe Int       -- Target position for drop
     , isTextareaFocused : Bool          -- Is editor textarea focused
     , showHelpDialog : Bool             -- Is help dialog visible
+    , language : Language               -- UI language (English | Finnish)
     }
 ```
 
@@ -130,6 +149,7 @@ type alias Model =
 - `dropTargetIndex`: Tracks hover target during drag (for visual placeholder)
 - `isTextareaFocused`: Prevents keyboard shortcuts when typing
 - `showHelpDialog`: Controls help dialog visibility
+- `language`: Current UI language preference
 
 **Initial Value:**
 ```elm
@@ -143,6 +163,7 @@ initialModel =
     , dropTargetIndex = Nothing
     , isTextareaFocused = False
     , showHelpDialog = False
+    , language = English
     }
 ```
 
