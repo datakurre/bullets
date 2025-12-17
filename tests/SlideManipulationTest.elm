@@ -19,481 +19,445 @@ makeSlide content =
 
 suite : Test
 suite =
-    describe "Slide Manipulation Functions"
+    describe "Slide Manipulation"
         [ describe "addSlide"
-            [ test "adds a new slide to empty list" <|
-                \_ ->
-                    let
-                        result =
-                            addSlide []
-                    in
-                    Expect.equal (List.length result) 1
-            , test "adds a new slide to end of list" <|
-                \_ ->
-                    let
-                        slides =
-                            [ makeSlide "First", makeSlide "Second" ]
+            [ describe "given an empty presentation"
+                [ test "should add a new slide" <|
+                    \_ ->
+                        addSlide []
+                            |> List.length
+                            |> Expect.equal 1
+                , test "should create slide with default content" <|
+                    \_ ->
+                        case addSlide [] |> List.head of
+                            Just slide ->
+                                Expect.equal slide.content "# New Slide"
 
-                        result =
-                            addSlide slides
-                    in
-                    Expect.equal (List.length result) 3
-            , test "new slide has default content" <|
-                \_ ->
-                    let
-                        result =
-                            addSlide []
-                    in
-                    case List.head result of
-                        Just slide ->
-                            Expect.equal slide.content "# New Slide"
+                            Nothing ->
+                                Expect.fail "Expected a slide"
+                , test "should create slide with no image" <|
+                    \_ ->
+                        case addSlide [] |> List.head of
+                            Just slide ->
+                                Expect.equal slide.image Nothing
 
-                        Nothing ->
-                            Expect.fail "Expected a slide"
-            , test "new slide has no image" <|
-                \_ ->
-                    let
-                        result =
-                            addSlide []
-                    in
-                    case List.head result of
-                        Just slide ->
-                            Expect.equal slide.image Nothing
-
-                        Nothing ->
-                            Expect.fail "Expected a slide"
+                            Nothing ->
+                                Expect.fail "Expected a slide"
+                ]
+            , describe "given an existing presentation"
+                [ test "should add new slide to end of list" <|
+                    \_ ->
+                        let
+                            slides =
+                                [ makeSlide "First", makeSlide "Second" ]
+                        in
+                        addSlide slides
+                            |> List.length
+                            |> Expect.equal 3
+                ]
             ]
         , describe "deleteSlide"
-            [ test "cannot delete from single-slide presentation" <|
-                \_ ->
-                    let
-                        slides =
-                            [ makeSlide "Only" ]
-
-                        result =
+            [ describe "given edge cases"
+                [ test "should not delete from single-slide presentation" <|
+                    \_ ->
+                        let
+                            slides =
+                                [ makeSlide "Only" ]
+                        in
+                        deleteSlide 0 slides
+                            |> Expect.equal slides
+                , test "should not delete from empty list" <|
+                    \_ ->
+                        deleteSlide 0 []
+                            |> Expect.equal []
+                ]
+            , describe "given a multi-slide presentation"
+                [ describe "when deleting at valid positions"
+                    [ test "should delete first slide" <|
+                        \_ ->
+                            let
+                                slides =
+                                    [ makeSlide "First", makeSlide "Second", makeSlide "Third" ]
+                            in
                             deleteSlide 0 slides
-                    in
-                    Expect.equal result slides
-            , test "cannot delete from empty list" <|
-                \_ ->
-                    let
-                        slides =
-                            []
-
-                        result =
-                            deleteSlide 0 slides
-                    in
-                    Expect.equal result slides
-            , test "deletes first slide" <|
-                \_ ->
-                    let
-                        slides =
-                            [ makeSlide "First", makeSlide "Second", makeSlide "Third" ]
-
-                        result =
-                            deleteSlide 0 slides
-                    in
-                    Expect.equal result [ makeSlide "Second", makeSlide "Third" ]
-            , test "deletes middle slide" <|
-                \_ ->
-                    let
-                        slides =
-                            [ makeSlide "First", makeSlide "Second", makeSlide "Third" ]
-
-                        result =
+                                |> Expect.equal [ makeSlide "Second", makeSlide "Third" ]
+                    , test "should delete middle slide" <|
+                        \_ ->
+                            let
+                                slides =
+                                    [ makeSlide "First", makeSlide "Second", makeSlide "Third" ]
+                            in
                             deleteSlide 1 slides
-                    in
-                    Expect.equal result [ makeSlide "First", makeSlide "Third" ]
-            , test "deletes last slide" <|
-                \_ ->
-                    let
-                        slides =
-                            [ makeSlide "First", makeSlide "Second", makeSlide "Third" ]
-
-                        result =
+                                |> Expect.equal [ makeSlide "First", makeSlide "Third" ]
+                    , test "should delete last slide" <|
+                        \_ ->
+                            let
+                                slides =
+                                    [ makeSlide "First", makeSlide "Second", makeSlide "Third" ]
+                            in
                             deleteSlide 2 slides
-                    in
-                    Expect.equal result [ makeSlide "First", makeSlide "Second" ]
-            , test "out of bounds index does not delete" <|
-                \_ ->
-                    let
-                        slides =
-                            [ makeSlide "First", makeSlide "Second" ]
-
-                        result =
+                                |> Expect.equal [ makeSlide "First", makeSlide "Second" ]
+                    ]
+                , describe "when index is out of bounds"
+                    [ test "should not delete with out of bounds index" <|
+                        \_ ->
+                            let
+                                slides =
+                                    [ makeSlide "First", makeSlide "Second" ]
+                            in
                             deleteSlide 5 slides
-                    in
-                    Expect.equal result slides
-            , test "negative index does not delete" <|
-                \_ ->
-                    let
-                        slides =
-                            [ makeSlide "First", makeSlide "Second" ]
-
-                        result =
+                                |> Expect.equal slides
+                    , test "should not delete with negative index" <|
+                        \_ ->
+                            let
+                                slides =
+                                    [ makeSlide "First", makeSlide "Second" ]
+                            in
                             deleteSlide -1 slides
-                    in
-                    Expect.equal result slides
+                                |> Expect.equal slides
+                    ]
+                ]
             ]
         , describe "duplicateSlide"
-            [ test "duplicates first slide" <|
-                \_ ->
-                    let
-                        slides =
-                            [ makeSlide "First", makeSlide "Second" ]
-
-                        result =
+            [ describe "given a presentation with slides"
+                [ describe "when duplicating at valid positions"
+                    [ test "should duplicate first slide" <|
+                        \_ ->
+                            let
+                                slides =
+                                    [ makeSlide "First", makeSlide "Second" ]
+                            in
                             duplicateSlide 0 slides
-                    in
-                    Expect.equal result [ makeSlide "First", makeSlide "First", makeSlide "Second" ]
-            , test "duplicates middle slide" <|
-                \_ ->
-                    let
-                        slides =
-                            [ makeSlide "First", makeSlide "Second", makeSlide "Third" ]
-
-                        result =
+                                |> Expect.equal [ makeSlide "First", makeSlide "First", makeSlide "Second" ]
+                    , test "should duplicate middle slide" <|
+                        \_ ->
+                            let
+                                slides =
+                                    [ makeSlide "First", makeSlide "Second", makeSlide "Third" ]
+                            in
                             duplicateSlide 1 slides
-                    in
-                    Expect.equal result [ makeSlide "First", makeSlide "Second", makeSlide "Second", makeSlide "Third" ]
-            , test "duplicates last slide" <|
-                \_ ->
-                    let
-                        slides =
-                            [ makeSlide "First", makeSlide "Second" ]
-
-                        result =
+                                |> Expect.equal [ makeSlide "First", makeSlide "Second", makeSlide "Second", makeSlide "Third" ]
+                    , test "should duplicate last slide" <|
+                        \_ ->
+                            let
+                                slides =
+                                    [ makeSlide "First", makeSlide "Second" ]
+                            in
                             duplicateSlide 1 slides
-                    in
-                    Expect.equal result [ makeSlide "First", makeSlide "Second", makeSlide "Second" ]
-            , test "out of bounds index returns original list" <|
-                \_ ->
-                    let
-                        slides =
-                            [ makeSlide "First", makeSlide "Second" ]
+                                |> Expect.equal [ makeSlide "First", makeSlide "Second", makeSlide "Second" ]
+                    ]
+                , describe "when duplicating slides with properties"
+                    [ test "should preserve all slide properties" <|
+                        \_ ->
+                            let
+                                originalSlide =
+                                    { content = "Special Content"
+                                    , image = Just "data:image/png;base64,test"
+                                    }
 
-                        result =
+                                slides =
+                                    [ makeSlide "First", originalSlide, makeSlide "Third" ]
+                            in
+                            case duplicateSlide 1 slides |> List.drop 2 |> List.head of
+                                Just duplicatedSlide ->
+                                    Expect.equal duplicatedSlide originalSlide
+
+                                Nothing ->
+                                    Expect.fail "Expected duplicated slide"
+                    ]
+                , describe "when index is out of bounds"
+                    [ test "should return original list" <|
+                        \_ ->
+                            let
+                                slides =
+                                    [ makeSlide "First", makeSlide "Second" ]
+                            in
                             duplicateSlide 5 slides
-                    in
-                    Expect.equal result slides
-            , test "duplicates slide with all properties" <|
-                \_ ->
-                    let
-                        originalSlide =
-                            { content = "Special Content"
-                            , image = Just "data:image/png;base64,test"
-                            }
-
-                        slides =
-                            [ makeSlide "First", originalSlide, makeSlide "Third" ]
-
-                        result =
-                            duplicateSlide 1 slides
-                    in
-                    case List.drop 2 result |> List.head of
-                        Just duplicatedSlide ->
-                            Expect.equal duplicatedSlide originalSlide
-
-                        Nothing ->
-                            Expect.fail "Expected duplicated slide"
+                                |> Expect.equal slides
+                    ]
+                ]
             ]
         , describe "moveSlideUp"
-            [ test "cannot move first slide up" <|
-                \_ ->
-                    let
-                        slides =
-                            [ makeSlide "First", makeSlide "Second" ]
-
-                        result =
-                            moveSlideUp 0 slides
-                    in
-                    Expect.equal result slides
-            , test "moves second slide to first position" <|
-                \_ ->
-                    let
-                        slides =
-                            [ makeSlide "First", makeSlide "Second" ]
-
-                        result =
+            [ describe "given a presentation with slides"
+                [ describe "when moving up from valid positions"
+                    [ test "should move second slide to first position" <|
+                        \_ ->
+                            let
+                                slides =
+                                    [ makeSlide "First", makeSlide "Second" ]
+                            in
                             moveSlideUp 1 slides
-                    in
-                    Expect.equal result [ makeSlide "Second", makeSlide "First" ]
-            , test "moves middle slide up one position" <|
-                \_ ->
-                    let
-                        slides =
-                            [ makeSlide "First", makeSlide "Second", makeSlide "Third" ]
-
-                        result =
+                                |> Expect.equal [ makeSlide "Second", makeSlide "First" ]
+                    , test "should move middle slide up one position" <|
+                        \_ ->
+                            let
+                                slides =
+                                    [ makeSlide "First", makeSlide "Second", makeSlide "Third" ]
+                            in
                             moveSlideUp 2 slides
-                    in
-                    Expect.equal result [ makeSlide "First", makeSlide "Third", makeSlide "Second" ]
-            , test "out of bounds index returns original list" <|
-                \_ ->
-                    let
-                        slides =
-                            [ makeSlide "First", makeSlide "Second" ]
-
-                        result =
+                                |> Expect.equal [ makeSlide "First", makeSlide "Third", makeSlide "Second" ]
+                    ]
+                , describe "when at boundaries"
+                    [ test "should not move first slide up" <|
+                        \_ ->
+                            let
+                                slides =
+                                    [ makeSlide "First", makeSlide "Second" ]
+                            in
+                            moveSlideUp 0 slides
+                                |> Expect.equal slides
+                    ]
+                , describe "when index is out of bounds"
+                    [ test "should return original list" <|
+                        \_ ->
+                            let
+                                slides =
+                                    [ makeSlide "First", makeSlide "Second" ]
+                            in
                             moveSlideUp 5 slides
-                    in
-                    Expect.equal result slides
+                                |> Expect.equal slides
+                    ]
+                ]
             ]
         , describe "moveSlideDown"
-            [ test "cannot move last slide down" <|
-                \_ ->
-                    let
-                        slides =
-                            [ makeSlide "First", makeSlide "Second" ]
-
-                        result =
+            [ describe "given a presentation with slides"
+                [ describe "when moving down from valid positions"
+                    [ test "should move first slide to second position" <|
+                        \_ ->
+                            let
+                                slides =
+                                    [ makeSlide "First", makeSlide "Second" ]
+                            in
+                            moveSlideDown 0 slides
+                                |> Expect.equal [ makeSlide "Second", makeSlide "First" ]
+                    , test "should move middle slide down one position" <|
+                        \_ ->
+                            let
+                                slides =
+                                    [ makeSlide "First", makeSlide "Second", makeSlide "Third" ]
+                            in
+                            moveSlideDown 0 slides
+                                |> Expect.equal [ makeSlide "Second", makeSlide "First", makeSlide "Third" ]
+                    ]
+                , describe "when at boundaries"
+                    [ test "should not move last slide down" <|
+                        \_ ->
+                            let
+                                slides =
+                                    [ makeSlide "First", makeSlide "Second" ]
+                            in
                             moveSlideDown 1 slides
-                    in
-                    Expect.equal result slides
-            , test "moves first slide to second position" <|
-                \_ ->
-                    let
-                        slides =
-                            [ makeSlide "First", makeSlide "Second" ]
-
-                        result =
-                            moveSlideDown 0 slides
-                    in
-                    Expect.equal result [ makeSlide "Second", makeSlide "First" ]
-            , test "moves middle slide down one position" <|
-                \_ ->
-                    let
-                        slides =
-                            [ makeSlide "First", makeSlide "Second", makeSlide "Third" ]
-
-                        result =
-                            moveSlideDown 0 slides
-                    in
-                    Expect.equal result [ makeSlide "Second", makeSlide "First", makeSlide "Third" ]
-            , test "out of bounds index returns original list" <|
-                \_ ->
-                    let
-                        slides =
-                            [ makeSlide "First", makeSlide "Second" ]
-
-                        result =
+                                |> Expect.equal slides
+                    ]
+                , describe "when index is out of bounds"
+                    [ test "should return original list" <|
+                        \_ ->
+                            let
+                                slides =
+                                    [ makeSlide "First", makeSlide "Second" ]
+                            in
                             moveSlideDown 5 slides
-                    in
-                    Expect.equal result slides
+                                |> Expect.equal slides
+                    ]
+                ]
             ]
         , describe "swapSlides"
-            [ test "swaps first and second slides" <|
-                \_ ->
-                    let
-                        slides =
-                            [ makeSlide "First", makeSlide "Second", makeSlide "Third" ]
-
-                        result =
+            [ describe "given a presentation with slides"
+                [ describe "when swapping valid positions"
+                    [ test "should swap first and second slides" <|
+                        \_ ->
+                            let
+                                slides =
+                                    [ makeSlide "First", makeSlide "Second", makeSlide "Third" ]
+                            in
                             swapSlides 0 1 slides
-                    in
-                    Expect.equal result [ makeSlide "Second", makeSlide "First", makeSlide "Third" ]
-            , test "swaps second and third slides" <|
-                \_ ->
-                    let
-                        slides =
-                            [ makeSlide "First", makeSlide "Second", makeSlide "Third" ]
-
-                        result =
+                                |> Expect.equal [ makeSlide "Second", makeSlide "First", makeSlide "Third" ]
+                    , test "should swap second and third slides" <|
+                        \_ ->
+                            let
+                                slides =
+                                    [ makeSlide "First", makeSlide "Second", makeSlide "Third" ]
+                            in
                             swapSlides 1 2 slides
-                    in
-                    Expect.equal result [ makeSlide "First", makeSlide "Third", makeSlide "Second" ]
-            , test "swaps first and last slides" <|
-                \_ ->
-                    let
-                        slides =
-                            [ makeSlide "First", makeSlide "Second", makeSlide "Third" ]
-
-                        result =
+                                |> Expect.equal [ makeSlide "First", makeSlide "Third", makeSlide "Second" ]
+                    , test "should swap first and last slides" <|
+                        \_ ->
+                            let
+                                slides =
+                                    [ makeSlide "First", makeSlide "Second", makeSlide "Third" ]
+                            in
                             swapSlides 0 2 slides
-                    in
-                    Expect.equal result [ makeSlide "Third", makeSlide "Second", makeSlide "First" ]
-            , test "swapping with same index returns original" <|
-                \_ ->
-                    let
-                        slides =
-                            [ makeSlide "First", makeSlide "Second" ]
-
-                        result =
+                                |> Expect.equal [ makeSlide "Third", makeSlide "Second", makeSlide "First" ]
+                    ]
+                , describe "when swapping with same index"
+                    [ test "should return original list" <|
+                        \_ ->
+                            let
+                                slides =
+                                    [ makeSlide "First", makeSlide "Second" ]
+                            in
                             swapSlides 0 0 slides
-                    in
-                    Expect.equal result slides
-            , test "out of bounds first index returns original" <|
-                \_ ->
-                    let
-                        slides =
-                            [ makeSlide "First", makeSlide "Second" ]
-
-                        result =
+                                |> Expect.equal slides
+                    ]
+                , describe "when indices are out of bounds"
+                    [ test "should return original with out of bounds first index" <|
+                        \_ ->
+                            let
+                                slides =
+                                    [ makeSlide "First", makeSlide "Second" ]
+                            in
                             swapSlides 5 1 slides
-                    in
-                    Expect.equal result slides
-            , test "out of bounds second index returns original" <|
-                \_ ->
-                    let
-                        slides =
-                            [ makeSlide "First", makeSlide "Second" ]
-
-                        result =
+                                |> Expect.equal slides
+                    , test "should return original with out of bounds second index" <|
+                        \_ ->
+                            let
+                                slides =
+                                    [ makeSlide "First", makeSlide "Second" ]
+                            in
                             swapSlides 0 5 slides
-                    in
-                    Expect.equal result slides
-            , test "negative indices return original" <|
-                \_ ->
-                    let
-                        slides =
-                            [ makeSlide "First", makeSlide "Second" ]
-
-                        result =
+                                |> Expect.equal slides
+                    , test "should return original with negative indices" <|
+                        \_ ->
+                            let
+                                slides =
+                                    [ makeSlide "First", makeSlide "Second" ]
+                            in
                             swapSlides -1 1 slides
-                    in
-                    Expect.equal result slides
-            , test "preserves all slide properties" <|
-                \_ ->
-                    let
-                        slide1 =
-                            { content = "Content 1"
-                            , image = Nothing
-                            }
+                                |> Expect.equal slides
+                    ]
+                , describe "when preserving properties"
+                    [ test "should preserve all slide properties" <|
+                        \_ ->
+                            let
+                                slide1 =
+                                    { content = "Content 1"
+                                    , image = Nothing
+                                    }
 
-                        slide2 =
-                            { content = "Content 2"
-                            , image = Just "data:image/png;base64,test"
-                            }
+                                slide2 =
+                                    { content = "Content 2"
+                                    , image = Just "data:image/png;base64,test"
+                                    }
 
-                        slides =
-                            [ slide1, slide2 ]
-
-                        result =
+                                slides =
+                                    [ slide1, slide2 ]
+                            in
                             swapSlides 0 1 slides
-                    in
-                    Expect.equal result [ slide2, slide1 ]
+                                |> Expect.equal [ slide2, slide1 ]
+                    ]
+                ]
             ]
         , describe "moveSlide"
-            [ test "moves slide forward" <|
-                \_ ->
-                    let
-                        slides =
-                            [ makeSlide "First", makeSlide "Second", makeSlide "Third" ]
-
-                        result =
+            [ describe "given a presentation with slides"
+                [ describe "when moving slides forward"
+                    [ test "should move slide from start to end" <|
+                        \_ ->
+                            let
+                                slides =
+                                    [ makeSlide "First", makeSlide "Second", makeSlide "Third" ]
+                            in
                             moveSlide 0 2 slides
-                    in
-                    Expect.equal result [ makeSlide "Second", makeSlide "Third", makeSlide "First" ]
-            , test "moves slide backward" <|
-                \_ ->
-                    let
-                        slides =
-                            [ makeSlide "First", makeSlide "Second", makeSlide "Third" ]
-
-                        result =
-                            moveSlide 2 0 slides
-                    in
-                    Expect.equal result [ makeSlide "Third", makeSlide "First", makeSlide "Second" ]
-            , test "moving to same position returns original" <|
-                \_ ->
-                    let
-                        slides =
-                            [ makeSlide "First", makeSlide "Second", makeSlide "Third" ]
-
-                        result =
-                            moveSlide 1 1 slides
-                    in
-                    Expect.equal result slides
-            , test "moves slide one position forward" <|
-                \_ ->
-                    let
-                        slides =
-                            [ makeSlide "First", makeSlide "Second", makeSlide "Third" ]
-
-                        result =
+                                |> Expect.equal [ makeSlide "Second", makeSlide "Third", makeSlide "First" ]
+                    , test "should move slide one position forward" <|
+                        \_ ->
+                            let
+                                slides =
+                                    [ makeSlide "First", makeSlide "Second", makeSlide "Third" ]
+                            in
                             moveSlide 0 1 slides
-                    in
-                    Expect.equal result [ makeSlide "Second", makeSlide "First", makeSlide "Third" ]
-            , test "moves slide one position backward" <|
-                \_ ->
-                    let
-                        slides =
-                            [ makeSlide "First", makeSlide "Second", makeSlide "Third" ]
-
-                        result =
-                            moveSlide 1 0 slides
-                    in
-                    Expect.equal result [ makeSlide "Second", makeSlide "First", makeSlide "Third" ]
-            , test "moves last slide to first position" <|
-                \_ ->
-                    let
-                        slides =
-                            [ makeSlide "First", makeSlide "Second", makeSlide "Third" ]
-
-                        result =
+                                |> Expect.equal [ makeSlide "Second", makeSlide "First", makeSlide "Third" ]
+                    ]
+                , describe "when moving slides backward"
+                    [ test "should move slide from end to start" <|
+                        \_ ->
+                            let
+                                slides =
+                                    [ makeSlide "First", makeSlide "Second", makeSlide "Third" ]
+                            in
                             moveSlide 2 0 slides
-                    in
-                    Expect.equal result [ makeSlide "Third", makeSlide "First", makeSlide "Second" ]
-            , test "out of bounds source index returns original" <|
-                \_ ->
-                    let
-                        slides =
-                            [ makeSlide "First", makeSlide "Second" ]
-
-                        result =
-                            moveSlide 5 0 slides
-                    in
-                    Expect.equal result slides
-            , test "out of bounds target index returns original" <|
-                \_ ->
-                    let
-                        slides =
-                            [ makeSlide "First", makeSlide "Second" ]
-
-                        result =
-                            moveSlide 0 5 slides
-                    in
-                    Expect.equal result slides
-            , test "negative source index returns original" <|
-                \_ ->
-                    let
-                        slides =
-                            [ makeSlide "First", makeSlide "Second" ]
-
-                        result =
-                            moveSlide -1 0 slides
-                    in
-                    Expect.equal result slides
-            , test "negative target index returns original" <|
-                \_ ->
-                    let
-                        slides =
-                            [ makeSlide "First", makeSlide "Second" ]
-
-                        result =
-                            moveSlide 0 -1 slides
-                    in
-                    Expect.equal result slides
-            , test "preserves all slide properties" <|
-                \_ ->
-                    let
-                        slide1 =
-                            makeSlide "Content 1"
-
-                        slide2 =
-                            { content = "Content 2"
-                            , image = Just "data:image/png;base64,test"
-                            }
-
-                        slide3 =
-                            makeSlide "Content 3"
-
-                        slides =
-                            [ slide1, slide2, slide3 ]
-
-                        result =
+                                |> Expect.equal [ makeSlide "Third", makeSlide "First", makeSlide "Second" ]
+                    , test "should move slide one position backward" <|
+                        \_ ->
+                            let
+                                slides =
+                                    [ makeSlide "First", makeSlide "Second", makeSlide "Third" ]
+                            in
                             moveSlide 1 0 slides
-                    in
-                    Expect.equal result [ slide2, slide1, slide3 ]
+                                |> Expect.equal [ makeSlide "Second", makeSlide "First", makeSlide "Third" ]
+                    , test "should move last slide to first position" <|
+                        \_ ->
+                            let
+                                slides =
+                                    [ makeSlide "First", makeSlide "Second", makeSlide "Third" ]
+                            in
+                            moveSlide 2 0 slides
+                                |> Expect.equal [ makeSlide "Third", makeSlide "First", makeSlide "Second" ]
+                    ]
+                , describe "when moving to same position"
+                    [ test "should return original list" <|
+                        \_ ->
+                            let
+                                slides =
+                                    [ makeSlide "First", makeSlide "Second", makeSlide "Third" ]
+                            in
+                            moveSlide 1 1 slides
+                                |> Expect.equal slides
+                    ]
+                , describe "when indices are out of bounds"
+                    [ test "should return original with out of bounds source" <|
+                        \_ ->
+                            let
+                                slides =
+                                    [ makeSlide "First", makeSlide "Second" ]
+                            in
+                            moveSlide 5 0 slides
+                                |> Expect.equal slides
+                    , test "should return original with out of bounds target" <|
+                        \_ ->
+                            let
+                                slides =
+                                    [ makeSlide "First", makeSlide "Second" ]
+                            in
+                            moveSlide 0 5 slides
+                                |> Expect.equal slides
+                    , test "should return original with negative source" <|
+                        \_ ->
+                            let
+                                slides =
+                                    [ makeSlide "First", makeSlide "Second" ]
+                            in
+                            moveSlide -1 0 slides
+                                |> Expect.equal slides
+                    , test "should return original with negative target" <|
+                        \_ ->
+                            let
+                                slides =
+                                    [ makeSlide "First", makeSlide "Second" ]
+                            in
+                            moveSlide 0 -1 slides
+                                |> Expect.equal slides
+                    ]
+                , describe "when preserving properties"
+                    [ test "should preserve all slide properties" <|
+                        \_ ->
+                            let
+                                slide1 =
+                                    makeSlide "Content 1"
+
+                                slide2 =
+                                    { content = "Content 2"
+                                    , image = Just "data:image/png;base64,test"
+                                    }
+
+                                slide3 =
+                                    makeSlide "Content 3"
+
+                                slides =
+                                    [ slide1, slide2, slide3 ]
+                            in
+                            moveSlide 1 0 slides
+                                |> Expect.equal [ slide2, slide1, slide3 ]
+                    ]
+                ]
             ]
         ]
