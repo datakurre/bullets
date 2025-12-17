@@ -41,14 +41,39 @@ The bullets project follows a **Test-Driven Development (TDD)** approach for bus
 
 **ENFORCE TDD** for all new features and bug fixes that involve business logic.
 
-### TDD Workflow
+### TDD with BDD Patterns
 
-1. **Write the test first**: Before implementing any new logic, write a failing test that describes the desired behavior
-2. **Run tests to confirm failure**: Verify the test fails for the right reason (`make test`)
-3. **Implement the minimal code**: Write just enough code to make the test pass
-4. **Run tests to confirm success**: Verify all tests pass (`make test`)
-5. **Refactor if needed**: Improve the code while keeping tests green
-6. **Format code**: Run `make format` before committing
+When writing tests first, use **BDD (Behavior-Driven Development)** patterns to make tests more readable:
+
+1. **Write behavior description**: Start with nested `describe` blocks describing the context and action
+2. **Write failing test**: Add `test` with "should" describing expected outcome
+3. **Run tests to confirm failure**: Verify the test fails (`make test`)
+4. **Implement the minimal code**: Write just enough code to make the test pass
+5. **Run tests to confirm success**: Verify all tests pass (`make test`)
+6. **Refactor if needed**: Improve the code while keeping tests green
+7. **Format code**: Run `make format` before committing
+
+Example TDD workflow:
+```elm
+-- Step 1: Write the behavior description and failing test
+describe "given an empty presentation"
+    [ describe "when adding a new slide"
+        [ test "should add the slide to the presentation" <|
+            \_ ->
+                -- Test implementation that will fail initially
+                model
+                    |> addSlide
+                    |> .slides
+                    |> List.length
+                    |> Expect.equal 1
+        ]
+    ]
+
+-- Step 2: Run tests (should fail)
+-- Step 3: Implement addSlide function
+-- Step 4: Run tests (should pass)
+-- Step 5: Refactor if needed
+```
 
 ### When to Apply TDD
 
@@ -99,48 +124,143 @@ tests/
 
 ### Test Structure
 
-Tests use `elm-test` with `describe`/`test` structure:
+Tests use `elm-test` with `describe`/`test` structure, following **BDD (Behavior-Driven Development)** patterns for improved readability and intent.
+
+#### BDD Pattern
+
+All tests follow a **given-when-then** structure using nested `describe` blocks:
 
 ```elm
-module NavigationTest exposing (..)
+module Update.NavigationTest exposing (suite)
 
 import Expect
-import Test exposing (..)
-import Navigation exposing (..)
+import Test exposing (Test, describe, test)
 
 suite : Test
 suite =
-    describe "Navigation"
-        [ describe "nextSlideIndex"
-            [ test "moves to next slide when not at end" <|
-                \_ ->
-                    nextSlideIndex 0 3
-                        |> Expect.equal 1
-            
-            , test "stays at last slide when at end" <|
-                \_ ->
-                    nextSlideIndex 2 3
-                        |> Expect.equal 2
+    describe "Update.Navigation"
+        [ describe "nextSlide"
+            [ describe "given a presentation with multiple slides"
+                [ describe "when navigating to next slide from the first slide"
+                    [ test "should move to the next slide" <|
+                        \_ ->
+                            let
+                                model =
+                                    modelWithSlides 3
+                                        |> (\m -> { m | currentSlideIndex = 0 })
+
+                                ( newModel, _ ) =
+                                    Update.Navigation.nextSlide model
+                            in
+                            Expect.equal 1 newModel.currentSlideIndex
+                    ]
+                , describe "when at the last slide"
+                    [ test "should stay at the last slide" <|
+                        \_ ->
+                            let
+                                model =
+                                    modelWithSlides 3
+                                        |> (\m -> { m | currentSlideIndex = 2 })
+
+                                ( newModel, _ ) =
+                                    Update.Navigation.nextSlide model
+                            in
+                            Expect.equal 2 newModel.currentSlideIndex
+                    ]
+                ]
             ]
         ]
 ```
 
+#### BDD Structure
+
+- **Given** (context): Nested `describe` blocks that start with "given"
+  - Sets up the context or initial state
+  - Example: `describe "given a presentation with multiple slides"`
+  
+- **When** (action): Nested `describe` blocks that start with "when"
+  - Describes the action being performed
+  - Example: `describe "when navigating to next slide"`
+  
+- **Then** (outcome): `test` names that start with "should"
+  - Describes the expected outcome
+  - Example: `test "should move to the next slide"`
+
+#### Test Naming Convention
+
+Test names complete the sentence started by the describe blocks:
+
+```
+Given a presentation with multiple slides
+  When navigating to next slide
+    → should move to the next slide
+    → should announce the new slide number
+```
+
+This creates readable test output that documents the behavior.
+
 ### Test Naming
 
-- **Describe blocks**: Name the function or feature being tested
-- **Test names**: Use descriptive phrases that explain the scenario
-- Format: "does X when Y" or "returns Z for input W"
-- Be specific about edge cases
+Tests follow **BDD (Behavior-Driven Development)** naming patterns for improved readability:
 
-Good examples:
-- ✅ "moves to next slide when not at end"
-- ✅ "stays at last slide when at end"
-- ✅ "wraps to first slide in presentation mode"
+- **Describe blocks (Given)**: Set context with "given" - describes the initial state
+  - Example: `describe "given a presentation with multiple slides"`
+  
+- **Describe blocks (When)**: Set action with "when" - describes what happens
+  - Example: `describe "when navigating to next slide"`
+  
+- **Test names (Should)**: Use "should" to describe expected outcome
+  - Example: `test "should move to the next slide"`
 
-Bad examples:
-- ❌ "test 1"
-- ❌ "works correctly"
-- ❌ "navigation"
+#### Good BDD Examples
+
+✅ Nested structure with clear intent:
+```elm
+describe "given a presentation with one slide"
+    [ describe "when attempting to delete the last slide"
+        [ test "should prevent deletion of the last slide" <|
+            -- test implementation
+        ]
+    ]
+```
+
+✅ Clear behavior description:
+```elm
+describe "given the help dialog is visible"
+    [ describe "when toggling the help dialog"
+        [ test "should hide the help dialog" <|
+            -- test implementation
+        ]
+    ]
+```
+
+#### Bad Examples
+
+❌ No context or structure:
+```elm
+test "test 1" <|
+    -- unclear what is being tested
+```
+
+❌ Implementation details instead of behavior:
+```elm
+test "sets index to 1" <|
+    -- describes implementation, not behavior
+```
+
+❌ Missing "should" in test name:
+```elm
+test "moves to next slide" <|
+    -- use "should move to next slide" instead
+```
+
+#### BDD Benefits
+
+- **Readable**: Tests read like specifications
+- **Documentation**: Test structure documents behavior
+- **Intent**: Clear separation of context, action, and outcome
+- **Maintainable**: Easy to locate and update related tests
+- **Discoverable**: Grouped tests make it easy to understand functionality
 
 ## Test Suites
 
