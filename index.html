@@ -1514,11 +1514,13 @@
                 });
                 
                 // Right side: image
+                // Use contain sizing with proper dimensions to preserve aspect ratio
+                // Available space: 4.5" wide x 4.625" tall (0.5" from top, leaving 0.5" at bottom)
                 pptxSlide.addImage({
                     data: slide.image,
                     x: 5.2,
                     y: 0.5,
-                    sizing: { type: 'contain', w: 4.5, h: 5 }
+                    sizing: { type: 'contain', w: 4.5, h: 4.625 }
                 });
             } else {
                 // No image, just use full width markdown
