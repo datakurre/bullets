@@ -2,7 +2,7 @@
 
 **Purpose**: View organization, component breakdown, CSS conventions, and UI implementation patterns for the bullets presentation tool
 
-**Last Updated**: 2024-12-16 (commit 74968b9)
+**Last Updated**: 2025-12-17 (commit c6805ef)
 
 ## Overview
 
@@ -14,10 +14,11 @@ The bullets UI follows a two-mode design with completely separate views for edit
 
 ```
 src/
-├── Main.elm              # Root view function, help dialog
+├── Main.elm              # Root view function, app container
 ├── View/
 │   ├── Edit.elm          # Edit mode view
-│   └── Present.elm       # Presentation mode view
+│   ├── Present.elm       # Presentation mode view
+│   └── HelpDialog.elm    # Help dialog component
 └── MarkdownView.elm      # Shared markdown rendering
 ```
 
