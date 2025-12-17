@@ -21,6 +21,15 @@ encodePresentation presentation =
 
 encodeSlide : Slide -> Encode.Value
 encodeSlide slide =
+    let
+        layout =
+            case slide.image of
+                Just _ ->
+                    "markdown-with-image"
+
+                Nothing ->
+                    "just-markdown"
+    in
     Encode.object
         [ ( "content", Encode.string slide.content )
         , ( "image"
@@ -31,6 +40,7 @@ encodeSlide slide =
                 Nothing ->
                     Encode.null
           )
+        , ( "layout", Encode.string layout )
         ]
 
 

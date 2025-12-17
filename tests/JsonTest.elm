@@ -3,6 +3,7 @@ module JsonTest exposing (..)
 import Expect
 import Json exposing (decodePresentation, encodePresentation)
 import Json.Decode as Decode
+import Json.Encode as Encode
 import Test exposing (..)
 
 
@@ -287,6 +288,84 @@ suite =
                                 Err _ ->
                                     -- Old format with layout field should fail since we removed layout from decoder
                                     Expect.pass
+                    ]
+                ]
+            ]
+        , describe "Layout field in encoded JSON"
+            [ describe "given a slide without an image"
+                [ describe "when encoding"
+                    [ test "should include layout field set to 'just-markdown'" <|
+                        \_ ->
+                            let
+                                slide =
+                                    { content = "# Test"
+                                    , image = Nothing
+                                    }
+
+                                presentation =
+                                    { slides = [ slide ]
+                                    , title = "Test"
+                                    , author = "Author"
+                                    , created = "2025-01-01"
+                                    }
+
+                                encoded =
+                                    encodePresentation presentation
+
+                                -- Decode the JSON to inspect it
+                                layoutDecoder =
+                                    Decode.at [ "slides" ]
+                                        (Decode.index 0
+                                            (Decode.field "layout" Decode.string)
+                                        )
+
+                                layout =
+                                    Decode.decodeValue layoutDecoder encoded
+                            in
+                            case layout of
+                                Ok layoutValue ->
+                                    Expect.equal layoutValue "just-markdown"
+
+                                Err err ->
+                                    Expect.fail ("Expected layout field but got: " ++ Decode.errorToString err)
+                    ]
+                ]
+            , describe "given a slide with an image"
+                [ describe "when encoding"
+                    [ test "should include layout field set to 'markdown-with-image'" <|
+                        \_ ->
+                            let
+                                slide =
+                                    { content = "# Test with image"
+                                    , image = Just "data:image/png;base64,test"
+                                    }
+
+                                presentation =
+                                    { slides = [ slide ]
+                                    , title = "Test"
+                                    , author = "Author"
+                                    , created = "2025-01-01"
+                                    }
+
+                                encoded =
+                                    encodePresentation presentation
+
+                                -- Decode the JSON to inspect it
+                                layoutDecoder =
+                                    Decode.at [ "slides" ]
+                                        (Decode.index 0
+                                            (Decode.field "layout" Decode.string)
+                                        )
+
+                                layout =
+                                    Decode.decodeValue layoutDecoder encoded
+                            in
+                            case layout of
+                                Ok layoutValue ->
+                                    Expect.equal layoutValue "markdown-with-image"
+
+                                Err err ->
+                                    Expect.fail ("Expected layout field but got: " ++ Decode.errorToString err)
                     ]
                 ]
             ]
