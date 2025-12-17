@@ -43,7 +43,7 @@ addSlideAfter index slides =
         after =
             List.drop (index + 1) slides
     in
-    before ++ [ newSlide ] ++ after
+    before ++ (newSlide :: after)
 
 
 {-| Delete a slide at the given index. Returns the original list if:
@@ -82,7 +82,7 @@ duplicateSlide index slides =
                 after =
                     List.drop (index + 1) slides
             in
-            before ++ [ slide ] ++ after
+            before ++ (slide :: after)
 
         Nothing ->
             slides
@@ -191,7 +191,7 @@ moveSlide sourceIndex targetIndex slides =
                     after =
                         List.drop targetIndex withoutSlide
                 in
-                before ++ [ slide ] ++ after
+                before ++ (slide :: after)
 
             Nothing ->
                 slides
