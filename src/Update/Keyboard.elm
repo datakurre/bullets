@@ -8,7 +8,6 @@ modifier keys, and context-aware behavior.
 -}
 
 import I18n
-import Navigation
 import Types exposing (Mode(..), Model, Msg(..))
 import Update.FileIO
 import Update.Image
