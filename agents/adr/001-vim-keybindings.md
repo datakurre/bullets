@@ -178,7 +178,6 @@ case model.mode of
 
 - VIM Navigation: http://vim.wikia.com/wiki/Navigation
 - WCAG Keyboard Accessibility: https://www.w3.org/WAI/WCAG21/Understanding/keyboard
-- Related TODO: TODO-A11Y.md (Phase 2: Keyboard Navigation Enhancements)
 
 ## Notes
 
