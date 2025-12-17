@@ -29,29 +29,6 @@
 - **Comprehensive accessibility support (WCAG 2.1 AA)**: ARIA labels, keyboard navigation, focus management, screen reader announcements, help dialog
 - **Internationalization (i18n)**: Multi-language support with English and Finnish translations, language selector UI, local storage persistence
 
-Recent commits:
-<<<<<<< HEAD
-- 38a25ed: Migrate Main.elm to use Update.elm coordinator (85% size reduction)
-- 410beda: Create Update.elm coordinator module
-- 8ea82f6: Create Update.Keyboard module
-- debf815: Create Update.UI module with TDD tests
-- 1b5fe64: Create Update.FileIO module with TDD tests
-- 12b571d: Create Update.Slide module with comprehensive TDD tests
-- 9d8ec30: Create Update.Image module with TDD tests
-- 876ce9f: Create Update.Content module with TDD tests
-- 2b6a776: Create Update.Storage module with TDD tests
-- 73ea52c: Create Update.Mode module with TDD tests
-- 1d93711: Create Update.Navigation module with TDD tests
-=======
-- 715297d: Add agents/dependencies.md - Phase 8 of refactor
-- 70150f6: Add agents/workflow.md - Phase 7 of refactor
-- 479ff4b: Add agents/testing.md - Phase 6 of refactor
-- 2e3fbf4: Add agents/build-and-dev.md - Phase 5 of refactor
-- 6df20c7: Increase thumbnail size by 1.5x (60x45 -> 90x68)
-- 03dabf8: Center icons in slide-item buttons
-- bad5c49: Show image thumbnails in slide navigation toolbar
->>>>>>> 49636f6 (Restructure AGENTS.md as index - Phase 9 of refactor)
-
 ## Current Features
 
 ### Edit Mode
@@ -89,102 +66,7 @@ A minimal, elegant presentation tool that:
 
 ✅ **All vision items are now implemented!**
 
-<<<<<<< HEAD
-## Accessibility (A11y)
-
-**ENFORCE ACCESSIBILITY** for all UI features and interactions following WCAG 2.1 AA guidelines:
-
-### Core Accessibility Features
-
-The application implements comprehensive accessibility support:
-
-#### Semantic HTML and ARIA
-- Proper landmark regions: `<nav>`, `<main>`, `<aside>` with appropriate `role` and `aria-label` attributes
-- ARIA labels on all interactive buttons for screen reader users
-- `role="list"` and `role="listitem"` for slide navigation
-- `aria-current="true"` indicates active slide in list
-- `role="toolbar"` for button groups
-- Live region announcements (`aria-live="polite"`) for:
-  - Slide navigation changes
-  - Mode transitions (entering/exiting presentation)
-  - Slide operations (add, delete, duplicate, reorder)
-
-#### Keyboard Navigation
-- **Full keyboard accessibility**: All features available without mouse
-- **VIM-style navigation**: j/k for next/prev slide, g/G for first/last, p for present
-- **Arrow key navigation**: Up/Down arrows in edit mode, all arrows in present mode
-- **Keyboard slide reordering**: Ctrl+Shift+Up/Down to move slides
-- **File operations**: Ctrl+O for import, Ctrl+I for image upload, Ctrl+S for export
-- **Help dialog**: Press '?' to view all keyboard shortcuts, ESC to close
-- **Skip to content link**: Visible on focus, jumps to main content area
-- Keyboard shortcuts automatically disabled while editing in textarea
-
-#### Focus Management
-- Visible focus indicators on all interactive elements (3px solid outline with sufficient contrast)
-- Logical focus order through interactive elements
-- Focus indicators styled for both light and dark active states
-
-#### Visual Accessibility
-- High-contrast light theme (beige background #f5f5f0, dark text #1a1a1a)
-- Consistent focus indicators with 3:1 minimum contrast ratio
-- Hover states on all interactive elements for visual feedback
-- Visual placeholder during drag and drop operations
-
-### Accessibility Requirements for New Features
-
-When implementing new features, **ALWAYS**:
-
-1. **Keyboard Accessibility**:
-   - Ensure all functionality is keyboard-accessible (no mouse-only interactions)
-   - Test with Tab, Shift+Tab, Enter, Space, Arrow keys, ESC
-   - Add keyboard shortcuts for frequently used actions
-   - Disable global shortcuts when user is typing in input fields
-
-2. **Screen Reader Support**:
-   - Add appropriate ARIA labels (`aria-label`, `aria-labelledby`)
-   - Use semantic HTML elements (button, nav, main, aside)
-   - Provide meaningful `role` attributes where needed
-   - Announce dynamic changes with live regions (`aria-live`)
-   - Set `aria-current` for current/active items
-
-3. **Focus Management**:
-   - Ensure logical tab order
-   - Add visible focus indicators (`:focus` styles)
-   - Use `:focus-visible` for keyboard-only focus indicators
-   - Maintain focus context during mode transitions
-
-4. **Visual Design**:
-   - Maintain 4.5:1 contrast ratio for normal text
-   - Maintain 3:1 contrast ratio for large text and UI components
-   - Use more than color alone to convey information
-   - Ensure focus indicators are clearly visible
-
-5. **Documentation**:
-   - Update help dialog with new keyboard shortcuts
-   - Add ARIA attributes to describe new interactive elements
-   - Document accessibility testing in TODO-A11Y.md
-
-### Testing Accessibility
-
-For any UI changes:
-- **Manual keyboard testing**: Navigate entire interface without mouse
-- **Screen reader testing**: Test with NVDA/JAWS (Windows), VoiceOver (macOS), Orca (Linux)
-- **Focus indicators**: Verify all interactive elements show clear focus
-- **Announcements**: Verify screen reader announces state changes
-- **Contrast**: Check color contrast ratios meet WCAG AA standards
-
-### Accessibility Resources
-
-- See TODO-A11Y.md for comprehensive accessibility task tracking
-- Phase 1 & 2 core tasks completed (ARIA, keyboard navigation, focus management)
-- Ongoing: Phase 3+ (color contrast audit, advanced features, testing)
-- Reference: [WCAG 2.1 Guidelines](https://www.w3.org/WAI/WCAG21/quickref/)
-- Reference: [ARIA Authoring Practices](https://www.w3.org/WAI/ARIA/apg/)
-
-## Development Environment
-=======
 ## Documentation Index
->>>>>>> 49636f6 (Restructure AGENTS.md as index - Phase 9 of refactor)
 
 Detailed documentation is organized into focused topic areas:
 
@@ -208,37 +90,13 @@ Detailed documentation is organized into focused topic areas:
 
 ## Quick Start
 
-<<<<<<< HEAD
-**Model**: Application state
-- mode: Mode (Edit | Present)
-- currentSlideIndex: Int
-- presentation: Presentation
-- editingContent: String (buffer for current edits)
-- draggedSlideIndex: Maybe Int (for drag and drop)
-- dropTargetIndex: Maybe Int (for visual placeholder)
-- language: Language (user's selected language)
-=======
 ### Enter Development Environment
->>>>>>> 49636f6 (Restructure AGENTS.md as index - Phase 9 of refactor)
 
 ```bash
 nix develop
 ```
 
-<<<<<<< HEAD
-- Navigation: NextSlide, PrevSlide, GoToSlide Int
-- Mode switching: EnterPresentMode, ExitPresentMode
-- Slide management: AddSlide, AddSlideAfter Int, DeleteSlide Int, DuplicateSlide Int, MoveSlideUp Int, MoveSlideDown Int
-- Drag and drop: DragStart Int, DragOver Int, DragEnd, Drop Int
-- Content editing: UpdateContent String, UpdateTitle String
-- Image handling: ImagePasted String, ImageUploadRequested, ImageFileSelected File, ImageFileLoaded String, RemoveImage
-- File operations: ImportPPTXRequested, PPTXFileSelected File, PPTXLoaded String, ExportToPPTX
-- Keyboard: KeyPressed String Bool Bool
-- Storage: LocalStorageLoaded String, LanguageLoaded String
-- Language: ChangeLanguage Language
-=======
 ### Common Commands
->>>>>>> 49636f6 (Restructure AGENTS.md as index - Phase 9 of refactor)
 
 ```bash
 make watch    # Development server with hot reload
@@ -251,82 +109,6 @@ make clean    # Remove build artifacts
 
 ### Key File Locations
 
-<<<<<<< HEAD
-### Update Architecture (Modular)
-
-**Update.elm**: Main coordinator module that routes all messages to specialized sub-modules.
-
-**Modular Update Modules** (single responsibility principle):
-- **Update.Navigation**: Slide navigation (NextSlide, PrevSlide, GoToSlide)
-- **Update.Mode**: Mode switching (EnterPresentMode, ExitPresentMode)
-- **Update.Content**: Content editing (UpdateContent, UpdateTitle)
-- **Update.Storage**: Local storage operations (LocalStorageLoaded)
-- **Update.Image**: Image handling (paste, upload, load, remove)
-- **Update.Slide**: Slide manipulation (add, delete, duplicate, move, drag-drop)
-- **Update.FileIO**: PowerPoint import/export (ExportToPPTX, ImportPPTXRequested, PPTXImported)
-- **Update.UI**: UI state (help dialog, language, textarea focus)
-- **Update.Keyboard**: Keyboard event routing (KeyPressed, delegates to other modules)
-
-**Benefits**:
-- **Maintainability**: Each module has single, clear responsibility
-- **Testability**: 146 unit tests covering all update logic
-- **Readability**: Easy to locate specific functionality
-- **Scalability**: Adding new features doesn't bloat Main.elm
-- **Reduced Main.elm**: From 810 lines to 124 lines (85% reduction)
-
-**Architecture Pattern**:
-```elm
--- Main.elm delegates to Update.elm
-update = Update.update
-
--- Update.elm routes to specialized modules
-update msg model =
-    case msg of
-        NextSlide -> Update.Navigation.nextSlide model
-        AddSlide -> Update.Slide.addSlide model
-        -- ... etc
-```
-
-### Internationalization (i18n)
-
-**Language Support**: Currently supports English (default) and Finnish.
-
-**Architecture**:
-- `I18n` module provides type-safe translation system
-- `Language` union type (English | Finnish) for compile-time safety
-- `Translations` record type ensures all translations present
-- Language preference persisted to local storage
-
-**Translation Pattern**:
-```elm
-let
-    t = I18n.translations model.language
-in
-    button [] [ text t.addSlide ]
-```
-
-**How to Add a New Language**:
-1. Add variant to `Language` type in `src/I18n.elm`
-2. Add translation function for the new language (follow `english` or `finnish` pattern)
-3. Update `translations` function to handle new language
-4. Add encoding/decoding support in `encodeLanguage` and `decodeLanguage`
-5. Update language selector in `View.Edit.viewLanguageSelector`
-6. Add new option to the dropdown with appropriate label
-
-**Translation Key Naming**:
-- Use camelCase for translation keys
-- Group related translations (e.g., `addSlide`, `deleteSlide`)
-- Use descriptive names that indicate UI context
-- Keep ARIA label keys explicit (e.g., `moveSlideUp` vs `moveSlideUpLabel`)
-
-**Storage**:
-- Language preference stored separately from presentation data
-- Key: `LANGUAGE_KEY` in localStorage
-- Automatically loaded on app initialization
-- Changes saved immediately when user switches language
-
-## Development Workflow
-=======
 ```
 src/
 ├── Main.elm              # Application entry point
@@ -336,76 +118,19 @@ src/
 ├── SlideManipulation.elm # Slide operations
 ├── MarkdownView.elm      # Markdown rendering
 ├── Ports.elm             # JavaScript interop
+├── Update.elm            # Main update coordinator
+├── I18n.elm              # Internationalization
 └── View/
     ├── Edit.elm          # Edit mode UI
-    └── Present.elm       # Presentation mode UI
->>>>>>> 49636f6 (Restructure AGENTS.md as index - Phase 9 of refactor)
+    ├── Present.elm       # Presentation mode UI
+    └── HelpDialog.elm    # Help dialog
 
 tests/
 ├── JsonTest.elm          # JSON tests
 ├── NavigationTest.elm    # Navigation tests
-└── SlideManipulationTest.elm  # Slide manipulation tests
+├── SlideManipulationTest.elm  # Slide manipulation tests
+└── Update/               # Update module tests
 
-<<<<<<< HEAD
-## Test-Driven Development (TDD)
-
-**ENFORCE TDD** for all new features and bug fixes that involve business logic:
-
-### TDD Workflow
-1. **Write the test first**: Before implementing any new logic, write a failing test that describes the desired behavior
-2. **Run tests to confirm failure**: Verify the test fails for the right reason (`make test`)
-3. **Implement the minimal code**: Write just enough code to make the test pass
-4. **Run tests to confirm success**: Verify all tests pass (`make test`)
-5. **Refactor if needed**: Improve the code while keeping tests green
-6. **Format code**: Run `make format` before committing
-
-### When to Apply TDD
-- **ALWAYS** for pure functions (encoders, decoders, transformations, utilities)
-- **ALWAYS** for business logic (slide manipulation, navigation logic, data validation)
-- **ALWAYS** for bug fixes (write a test that reproduces the bug first)
-- UI changes may be tested manually if unit testing is impractical
-
-### Test Organization
-- Place tests in `tests/` directory matching source module names
-- Group related tests using `describe` blocks
-- Use descriptive test names that explain what is being tested
-- Each test should focus on one specific behavior
-- Maintain high test coverage for critical paths
-
-### Current Test Coverage
-- 80 unit tests covering core functionality
-- Focus areas: JSON serialization, navigation logic, slide manipulation
-- Run `make coverage` to generate HTML coverage report
-
-## Code Style
-
-- Use elm-format standard formatting
-- Prefer explicit type annotations
-- Keep functions small and focused
-- Use descriptive names for types and functions
-- Group related functions together
-- Add comments for complex logic only
-
-## Testing Strategy
-
-- Unit tests for pure functions (encoders, decoders, transformations)
-- Manual testing for UI interactions (documented in MANUAL_TESTING.md)
-- Cross-browser testing before major releases
-- Focus on data integrity (JSON round-trip correctness)
-- Run elm-review for code quality checks
-- All tests pass: 80 unit tests currently in test suite
-
-## Dependencies
-
-Core:
-- elm/browser - Application framework
-- elm/json - JSON encoding/decoding
-- elm/html - View rendering
-- elm/file - File upload/download
-
-Markdown:
-- dillonkearns/elm-markdown - Markdown parsing and rendering with custom renderer support
-=======
 agents/
 ├── README.md             # Agent docs overview
 ├── architecture.md       # System architecture
@@ -417,7 +142,6 @@ agents/
 ├── dependencies.md       # Dependencies
 └── adr/                  # Architecture decisions
 ```
->>>>>>> 49636f6 (Restructure AGENTS.md as index - Phase 9 of refactor)
 
 ## Notes for LLM Agents
 
@@ -444,4 +168,3 @@ agents/
 10. Move to next task
 
 For complete workflow details, see [Workflow Documentation](./agents/workflow.md).
-
