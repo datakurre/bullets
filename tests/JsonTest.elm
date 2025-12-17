@@ -254,7 +254,7 @@ suite =
                                 Nothing ->
                                     Expect.fail "Expected at least one slide"
 
-                        Err err ->
+                        Err _ ->
                             -- Old format with layout field should fail since we removed layout from decoder
                             Expect.pass
             ]
