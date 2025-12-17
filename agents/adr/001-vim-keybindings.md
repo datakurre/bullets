@@ -1,7 +1,8 @@
 # ADR 001: VIM-Style Keybindings for Navigation and Editing
 
 **Status:** Accepted
-**Date:** 2025-12-16  
+**Date:** 2024-12-16  
+**Last Reviewed:** 2024-12-17
 **Deciders:** Project maintainers  
 
 ## Context
