@@ -29,7 +29,10 @@ src/
 ├── Navigation.elm        # Slide navigation logic
 ├── SlideManipulation.elm # Slide operations (add, delete, move, etc.)
 ├── MarkdownView.elm      # Markdown rendering helper
-├── I18n.elm              # Internationalization (translations)
+├── I18n.elm              # Internationalization (main module)
+├── I18n/                 # Language-specific translation modules
+│   ├── En.elm            # English translations
+│   └── Fi.elm            # Finnish translations
 ├── Update.elm            # Main update coordinator
 ├── Update/               # Modular update sub-modules
 │   ├── Content.elm       # Content editing logic
@@ -321,10 +324,11 @@ Features:
 - Consistent with terminal habits
 
 ### Internationalization (i18n)
-- Type-safe translation system via I18n module
+- Type-safe translation system via modular I18n structure
 - Language union type (English | Finnish) for compile-time safety
+- Language-specific modules (I18n/En.elm, I18n/Fi.elm) for maintainability
 - Language preference persisted to localStorage
-- Easy to add new languages
+- Easy to add new languages: create new module, update main I18n.elm
 - All UI text translated, not user content
 
 ### Accessibility (WCAG 2.1 AA)
