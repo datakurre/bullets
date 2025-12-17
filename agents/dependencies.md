@@ -2,7 +2,7 @@
 
 **Purpose**: Comprehensive guide to all external dependencies, their purposes, versions, and integration rationale for the bullets presentation tool.
 
-**Last Updated**: 2024-12-16
+**Last Updated**: 2024-12-17
 
 ## Overview
 
@@ -631,11 +631,7 @@ nix develop
 
 ### Potential Additions
 
-**Accessibility**:
-- elm-a11y: Accessibility helpers (if needed)
-
-**Internationalization**:
-- elm-i18n: Translation support (planned feature)
+**Note**: Internationalization (I18n) is already implemented using a custom solution in `src/I18n.elm` without external dependencies.
 
 **Advanced Features**:
 - elm-ui: Alternative UI framework (if CSS becomes limiting)
