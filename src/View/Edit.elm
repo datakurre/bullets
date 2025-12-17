@@ -91,9 +91,9 @@ viewLanguageSelector model =
         , attribute "role" "radiogroup"
         , attribute "aria-label" t.selectLanguage
         ]
-        [ radioOption I18n.Finnish "Suomi"
-        , text " | "
-        , radioOption I18n.English "English"
+        [ radioOption I18n.Finnish "suomeksi"
+        , text " "
+        , radioOption I18n.English "in English"
         ]
 
 
